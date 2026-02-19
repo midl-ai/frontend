@@ -4,6 +4,7 @@ import type { UIMessage } from '@ai-sdk/react';
 import { User, Bot, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SuggestionAwareMarkdown } from './suggestion-aware-md';
+import { ToolResultRenderer } from './tool-result-renderer';
 
 interface MessageProps {
   message: UIMessage;
@@ -96,54 +97,12 @@ export function Message({ message }: MessageProps) {
         );
       }
 
-      // Tool result parts - show result
+      // Tool result parts - route to appropriate card component
       if (isToolResultPart(part)) {
-        const result = part.result;
-
-        // Check if it's a MIDL tool response with success/error
-        if (result && typeof result === 'object' && 'success' in result) {
-          const toolResult = result as {
-            success: boolean;
-            data?: unknown;
-            error?: string;
-          };
-
-          if (!toolResult.success) {
-            return (
-              <div
-                key={index}
-                className="my-2 p-3 rounded-lg bg-error/10 border border-error/20"
-              >
-                <p className="text-sm text-error">Error: {toolResult.error}</p>
-              </div>
-            );
-          }
-
-          // Render tool result data
-          return (
-            <div
-              key={index}
-              className="my-2 p-3 rounded-lg bg-background-secondary border border-border"
-            >
-              <p className="text-xs text-foreground-muted mb-2 font-mono">
-                {part.toolName}
-              </p>
-              <pre className="text-sm overflow-x-auto whitespace-pre-wrap">
-                {JSON.stringify(toolResult.data, null, 2)}
-              </pre>
-            </div>
-          );
-        }
-
-        // Generic result display
+        // Use the ToolResultRenderer to display the appropriate card
         return (
-          <div
-            key={index}
-            className="my-2 p-3 rounded-lg bg-background-secondary border border-border"
-          >
-            <pre className="text-sm overflow-x-auto whitespace-pre-wrap">
-              {JSON.stringify(result, null, 2)}
-            </pre>
+          <div key={index} className="my-2">
+            <ToolResultRenderer toolName={part.toolName} result={part.result} />
           </div>
         );
       }
