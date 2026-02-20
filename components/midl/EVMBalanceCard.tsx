@@ -16,9 +16,14 @@ export function EVMBalanceCard({ data }: EVMBalanceCardProps) {
   const { address, balanceFormatted, explorerUrl } = data.data;
 
   return (
-    <BaseCard title="EVM Balance" icon={<Wallet className="w-4 h-4" />}>
-      <AddressDisplay address={address} label="Address" explorerUrl={explorerUrl} />
-      <DataRow label="Balance" value={balanceFormatted} highlight />
+    <BaseCard 
+      title="EVM Balance" 
+      icon={<Wallet className="w-4 h-4" />}
+      explorerLink={explorerUrl}
+      variant="success"
+    >
+      <AddressDisplay address={address} label="Address" />
+      <DataRow label="Balance" value={balanceFormatted} highlight mono />
     </BaseCard>
   );
 }

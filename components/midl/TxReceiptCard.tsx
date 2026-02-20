@@ -1,6 +1,6 @@
 'use client';
 
-import { Receipt, ExternalLink } from 'lucide-react';
+import { Receipt } from 'lucide-react';
 import { BaseCard, ErrorCard, DataRow, AddressDisplay } from './base';
 import type { ToolResponse, TxReceiptInfo } from '@/lib/ai/tools/types';
 
@@ -19,24 +19,23 @@ export function TxReceiptCard({ data }: TxReceiptCardProps) {
     <BaseCard
       title="Transaction Receipt"
       icon={<Receipt className="w-4 h-4" />}
+      explorerLink={explorerUrl}
       variant={status === 'success' ? 'success' : 'error'}
     >
-      <DataRow label="Status" value={status === 'success' ? '✓ Success' : '✗ Reverted'} highlight />
-      <DataRow label="Hash" value={`${txHash.slice(0, 12)}...${txHash.slice(-8)}`} mono />
+      <DataRow 
+        label="Status" 
+        value={status === 'success' ? 'Success' : 'Reverted'} 
+        highlight 
+        className={status === 'success' ? 'text-success' : 'text-error'}
+      />
+      <DataRow label="Hash" value={txHash} mono copyable />
       <DataRow label="Block" value={blockNumber.toLocaleString()} />
-      <AddressDisplay address={from} label="From" />
-      <AddressDisplay address={to} label="To" />
       <DataRow label="Gas Used" value={gasUsed} mono />
       <DataRow label="Logs" value={logsCount} />
-      <div className="pt-2">
-        <a
-          href={explorerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-accent hover:underline flex items-center gap-1"
-        >
-          View in Explorer <ExternalLink className="w-3 h-3" />
-        </a>
+      
+      <div className="pt-2 space-y-2 border-t border-border/50">
+        <AddressDisplay address={from} label="From" />
+        <AddressDisplay address={to} label="To" />
       </div>
     </BaseCard>
   );

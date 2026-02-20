@@ -8,9 +8,11 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch
+  // Avoid hydration mismatch - this is a standard pattern for next-themes
+  // The setState in useEffect is intentional for hydration safety
   useEffect(() => {
-    setMounted(true);
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   if (!mounted) {

@@ -1,4 +1,4 @@
-import { eq, desc, lt, and, sql } from 'drizzle-orm';
+import { eq, desc, lt, and } from 'drizzle-orm';
 import { db } from './index';
 import { user, chat, message, stream } from './schema';
 import type { NewUser, NewChat, NewMessage, NewStream, Chat, Message } from './schema';

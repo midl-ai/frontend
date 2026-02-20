@@ -1,7 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { readContract } from '@/lib/midl/client';
-import { getNetworkConfig } from '@/lib/midl/config';
 
 /** Minimal ERC20 ABI for balance and metadata */
 const ERC20_ABI = [
@@ -54,7 +53,6 @@ export const midl_get_token_balance = tool({
         };
       }
 
-      const config = getNetworkConfig();
       const token = tokenAddress as `0x${string}`;
       const owner = ownerAddress as `0x${string}`;
 

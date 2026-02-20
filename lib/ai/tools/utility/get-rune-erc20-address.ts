@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { keccak256, toHex, encodePacked } from 'viem';
+import { keccak256, encodePacked } from 'viem';
 import { getNetworkConfig } from '@/lib/midl/config';
 
 export const midl_get_rune_erc20_address = tool({

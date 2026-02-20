@@ -31,15 +31,22 @@ export function BridgeStatusCard({ data }: BridgeStatusCardProps) {
 
   return (
     <BaseCard title="Bridge Status" icon={getIcon()} variant={getVariant()}>
-      <DataRow label="Status" value={status} highlight />
+      <DataRow 
+        label="Status" 
+        value={status.toUpperCase()} 
+        highlight 
+        className={isComplete ? 'text-success' : 'text-warning'}
+      />
       <DataRow
         label="Confirmations"
         value={`${confirmations} / ${requiredConfirmations}`}
+        mono
       />
-      <DataRow label="TX Hash" value={`${txHash.slice(0, 12)}...${txHash.slice(-8)}`} mono />
+      <DataRow label="TX Hash" value={txHash} mono copyable />
+      
       {!isComplete && (
-        <div className="pt-2 text-xs text-foreground-muted">
-          Waiting for {requiredConfirmations - confirmations} more confirmation(s)
+        <div className="mt-3 p-2 bg-background-tertiary rounded text-[10px] text-foreground-muted text-center animate-pulse">
+          Waiting for network confirmation...
         </div>
       )}
     </BaseCard>

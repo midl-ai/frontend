@@ -16,10 +16,15 @@ export function BTCBalanceCard({ data }: BTCBalanceCardProps) {
   const { address, balanceFormatted, utxoCount, explorerUrl } = data.data;
 
   return (
-    <BaseCard title="BTC Balance" icon={<Bitcoin className="w-4 h-4" />}>
-      <AddressDisplay address={address} label="Address" explorerUrl={explorerUrl} />
-      <DataRow label="Balance" value={balanceFormatted} highlight />
-      <DataRow label="UTXOs" value={utxoCount} />
+    <BaseCard 
+      title="BTC Balance" 
+      icon={<Bitcoin className="w-4 h-4" />}
+      explorerLink={explorerUrl}
+      variant="success"
+    >
+      <AddressDisplay address={address} label="Address" />
+      <DataRow label="Balance" value={balanceFormatted} highlight mono />
+      <DataRow label="UTXOs" value={utxoCount} mono />
     </BaseCard>
   );
 }

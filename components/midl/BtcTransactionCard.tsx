@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRightLeft, ExternalLink } from 'lucide-react';
+import { ArrowRightLeft } from 'lucide-react';
 import { BaseCard, ErrorCard, DataRow } from './base';
 import type { ToolResponse, BtcTxInfo } from '@/lib/ai/tools/types';
 
@@ -20,24 +20,22 @@ export function BtcTransactionCard({ data }: BtcTransactionCardProps) {
     <BaseCard
       title="BTC Transaction"
       icon={<ArrowRightLeft className="w-4 h-4" />}
+      explorerLink={explorerUrl}
       variant={confirmed ? 'success' : 'warning'}
     >
-      <DataRow label="TXID" value={`${txid.slice(0, 12)}...${txid.slice(-8)}`} mono />
-      <DataRow label="Status" value={confirmed ? 'Confirmed' : 'Pending'} highlight />
+      <DataRow label="TXID" value={txid} mono copyable />
+      <DataRow 
+        label="Status" 
+        value={confirmed ? 'Confirmed' : 'Pending'} 
+        highlight 
+        className={confirmed ? 'text-success' : 'text-warning'}
+      />
       {blockHeight && <DataRow label="Block" value={blockHeight.toLocaleString()} />}
-      <DataRow label="Fee" value={`${feeBtc} BTC`} />
+      <DataRow label="Fee" value={`${feeBtc} BTC`} mono />
       <DataRow label="Size" value={`${size} bytes`} />
-      <DataRow label="Inputs" value={inputs.length} />
-      <DataRow label="Outputs" value={outputs.length} />
-      <div className="pt-2">
-        <a
-          href={explorerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-accent hover:underline flex items-center gap-1"
-        >
-          View in Explorer <ExternalLink className="w-3 h-3" />
-        </a>
+      <div className="flex gap-4">
+        <DataRow label="Inputs" value={inputs.length} />
+        <DataRow label="Outputs" value={outputs.length} />
       </div>
     </BaseCard>
   );

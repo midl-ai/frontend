@@ -1,4 +1,19 @@
 import { defineChain } from 'viem';
+import { createConfig, regtest } from '@midl/core';
+import { xverseConnector } from '@midl/connectors';
+
+/** MIDL SDK configuration with Xverse wallet connector */
+export const midlConfig = createConfig({
+  networks: [regtest],
+  connectors: [xverseConnector()],
+  persist: true,
+});
+
+/** Bitcoin explorer URL */
+export const BTC_EXPLORER_URL = 'https://mempool.staging.midl.xyz';
+
+/** Faucet URL for getting test BTC */
+export const FAUCET_URL = 'https://faucet.midl.xyz';
 
 /** MIDL Regtest chain configuration */
 export const midlRegtest = defineChain({

@@ -16,36 +16,40 @@ export function DeploymentCard({ data }: DeploymentCardProps) {
   const { contractAddress, txHash, blockNumber, gasUsed, explorerUrl, btcTxId, btcExplorerUrl } = data.data;
 
   return (
-    <BaseCard title="Contract Deployed" icon={<Rocket className="w-4 h-4" />} variant="success">
+    <BaseCard 
+      title="Contract Deployed" 
+      icon={<Rocket className="w-4 h-4" />} 
+      explorerLink={`${explorerUrl}/address/${contractAddress}`}
+      variant="success"
+    >
+      <div className="mb-4 bg-success/10 border border-success/20 rounded-lg p-3 text-center">
+        <span className="text-xs text-success font-bold uppercase tracking-wider">Deployment Successful</span>
+      </div>
+
       <AddressDisplay
         address={contractAddress}
-        label="Contract"
-        explorerUrl={`${explorerUrl}/address/${contractAddress}`}
+        label="New Contract Address"
       />
-      <DataRow label="TX Hash" value={`${txHash.slice(0, 12)}...${txHash.slice(-8)}`} mono />
-      <DataRow label="Block" value={blockNumber.toLocaleString()} />
-      <DataRow label="Gas Used" value={gasUsed} mono />
-      {btcTxId && (
-        <DataRow label="BTC TX" value={`${btcTxId.slice(0, 12)}...`} mono />
-      )}
-      <div className="pt-2 flex gap-4">
-        <a
-          href={`${explorerUrl}/address/${contractAddress}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-accent hover:underline flex items-center gap-1"
-        >
-          View Contract <ExternalLink className="w-3 h-3" />
-        </a>
-        {btcExplorerUrl && (
-          <a
-            href={btcExplorerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-accent hover:underline flex items-center gap-1"
-          >
-            BTC TX <ExternalLink className="w-3 h-3" />
-          </a>
+      
+      <div className="mt-4 pt-4 border-t border-border/50 space-y-2">
+        <DataRow label="TX Hash" value={txHash} mono copyable />
+        <DataRow label="Block" value={blockNumber.toLocaleString()} />
+        <DataRow label="Gas Used" value={gasUsed} mono />
+        
+        {btcTxId && (
+          <div className="pt-2 mt-2 border-t border-border/50">
+             <DataRow label="BTC Anchor TX" value={btcTxId} mono copyable />
+             {btcExplorerUrl && (
+               <a 
+                 href={btcExplorerUrl}
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="text-[10px] flex items-center gap-1 text-foreground-muted hover:text-accent mt-1 justify-end"
+               >
+                 View BTC Transaction <ExternalLink className="w-3 h-3" />
+               </a>
+             )}
+          </div>
         )}
       </div>
     </BaseCard>

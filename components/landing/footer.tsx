@@ -1,0 +1,105 @@
+'use client';
+
+import Link from 'next/link';
+import { Terminal, Github, Twitter } from 'lucide-react';
+
+const FOOTER_LINKS = {
+  Product: [
+    { label: 'Terminal', href: '/chat' },
+    { label: 'Documentation', href: 'https://github.com' },
+    { label: 'API Reference', href: 'https://github.com' },
+  ],
+  Resources: [
+    { label: 'Getting Started', href: 'https://github.com' },
+    { label: 'Examples', href: 'https://github.com' },
+    { label: 'MCP Server', href: 'https://github.com' },
+  ],
+  Community: [
+    { label: 'GitHub', href: 'https://github.com' },
+    { label: 'Twitter', href: 'https://twitter.com' },
+    { label: 'Discord', href: 'https://discord.com' },
+  ],
+};
+
+/** Site footer */
+export function Footer() {
+  return (
+    <footer className="border-t border-border bg-background-secondary py-16">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16">
+          {/* Brand column */}
+          <div className="col-span-2 md:col-span-1 space-y-4">
+            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center border border-accent/20">
+                <Terminal className="w-4 h-4 text-accent" />
+              </div>
+              <span>
+                MIDL<span className="text-accent">.AI</span>
+              </span>
+            </Link>
+            <p className="text-sm text-foreground-muted max-w-xs">
+              The intelligence layer for Bitcoin. Talk to the blockchain with natural language.
+            </p>
+            {/* Social */}
+            <div className="flex gap-3 pt-2">
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-lg bg-background-tertiary flex items-center justify-center text-foreground-muted hover:text-foreground hover:bg-background-hover transition-all"
+                aria-label="GitHub"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-lg bg-background-tertiary flex items-center justify-center text-foreground-muted hover:text-foreground hover:bg-background-hover transition-all"
+                aria-label="Twitter"
+              >
+                <Twitter className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+
+          {/* Link columns */}
+          {Object.entries(FOOTER_LINKS).map(([category, links]) => (
+            <div key={category}>
+              <h4 className="font-semibold text-sm text-foreground mb-4">
+                {category}
+              </h4>
+              <ul className="space-y-3">
+                {links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      className="text-sm text-foreground-muted hover:text-foreground transition-colors"
+                      target={link.href.startsWith('http') ? '_blank' : undefined}
+                      rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-foreground-muted">
+            © 2026 MIDL Protocol. Open Source under MIT License.
+          </p>
+          <p className="text-sm text-foreground-muted">
+            Built for{' '}
+            <span className="text-accent font-medium">VibeHack 2026</span>
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export default Footer;

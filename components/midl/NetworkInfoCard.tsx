@@ -16,13 +16,17 @@ export function NetworkInfoCard({ data }: NetworkInfoCardProps) {
   const { chainId, chainName, rpcUrl, explorerUrl, mempoolUrl, nativeCurrency } = data.data;
 
   return (
-    <BaseCard title="Network Info" icon={<Globe className="w-4 h-4" />}>
+    <BaseCard 
+      title="Network Info" 
+      icon={<Globe className="w-4 h-4" />}
+      explorerLink={explorerUrl}
+      variant="default"
+    >
       <DataRow label="Chain" value={chainName} highlight />
-      <DataRow label="Chain ID" value={chainId} mono />
+      <DataRow label="Chain ID" value={chainId} mono copyable />
       <DataRow label="Currency" value={`${nativeCurrency.symbol} (${nativeCurrency.decimals} decimals)`} />
-      <DataRow label="RPC" value={rpcUrl} mono />
-      <DataRow label="Explorer" value={explorerUrl} mono />
-      <DataRow label="Mempool" value={mempoolUrl} mono />
+      <DataRow label="RPC" value={rpcUrl} mono copyable />
+      <DataRow label="Mempool" value={mempoolUrl} mono copyable />
     </BaseCard>
   );
 }

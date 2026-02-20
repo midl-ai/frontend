@@ -6,8 +6,7 @@ import { DefaultChatTransport } from 'ai';
 import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
 import { SuggestedActions } from './suggested-actions';
-import { ThemeToggle } from '@/components/theme/theme-toggle';
-import { generateUUID } from '@/lib/utils';
+import { Terminal } from 'lucide-react';
 
 interface ChatProps {
   id: string;
@@ -22,9 +21,21 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
     messages: initialMessages,
     transport: new DefaultChatTransport({
       api: '/api/chat',
-      headers: () => ({
-        'Content-Type': 'application/json',
-      }),
+      headers: () => {
+        // Include wallet addresses in headers for API auth
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        if (typeof window !== 'undefined') {
+          const walletAddress = localStorage.getItem('walletAddress');
+          const evmAddress = localStorage.getItem('evmAddress');
+          const btcAddress = localStorage.getItem('btcAddress');
+          if (walletAddress) headers['x-wallet-address'] = walletAddress;
+          if (evmAddress) headers['x-evm-address'] = evmAddress;
+          if (btcAddress) headers['x-btc-address'] = btcAddress;
+        }
+        return headers;
+      },
       body: { id },
     }),
   });
@@ -49,32 +60,25 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-semibold text-foreground">
-            MIDL AI Terminal
-          </h1>
-          <span className="px-2 py-0.5 text-xs rounded-full bg-accent/20 text-accent">
-            Beta
-          </span>
-        </div>
-        <ThemeToggle />
-      </header>
-
+    <div className="flex flex-col h-full relative">
       {/* Messages Area */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full px-4">
-            <div className="max-w-2xl text-center space-y-6">
-              <h2 className="text-2xl font-bold text-foreground">
-                Welcome to MIDL AI
-              </h2>
-              <p className="text-foreground-muted">
-                Your intelligent assistant for the MIDL blockchain. Check
-                balances, bridge assets, deploy contracts, and more.
-              </p>
+          <div className="flex flex-col items-center justify-center h-full px-4 animate-fade-in">
+            <div className="max-w-2xl text-center space-y-8">
+              <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto border border-accent/20">
+                <Terminal className="w-8 h-8 text-accent" />
+              </div>
+              
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tight">
+                  MIDL Terminal
+                </h2>
+                <p className="text-foreground-muted text-lg max-w-lg mx-auto">
+                  Execute Bitcoin L1 and EVM L2 operations using natural language.
+                </p>
+              </div>
+
               <SuggestedActions onSelect={handleSuggestion} />
             </div>
           </div>
@@ -84,7 +88,7 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-border p-4">
+      <div className="p-4 md:p-6 bg-gradient-to-t from-background via-background to-transparent z-10">
         <div className="max-w-3xl mx-auto">
           <MultimodalInput
             input={input}
@@ -92,7 +96,6 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
             onSubmit={handleSubmit}
             isLoading={isLoading}
             stop={stop}
-            hasMessages={messages.length > 0}
           />
         </div>
       </div>

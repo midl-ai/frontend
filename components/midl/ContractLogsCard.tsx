@@ -1,6 +1,6 @@
 'use client';
 
-import { ScrollText, ExternalLink } from 'lucide-react';
+import { ScrollText } from 'lucide-react';
 import { BaseCard, ErrorCard, DataRow, AddressDisplay } from './base';
 import type { ToolResponse, ContractLogsInfo } from '@/lib/ai/tools/types';
 

@@ -30,21 +30,27 @@ export function ContractReadCard({ data }: ContractReadCardProps) {
 
   const { contractAddress, functionName, result } = data.data;
   const formattedResult = formatResult(result);
-  const isLongResult = formattedResult.length > 50;
+  const isLongResult = formattedResult.length > 40 || formattedResult.includes('\n');
 
   return (
     <BaseCard title="Contract Read" icon={<FileSearch className="w-4 h-4" />}>
-      <AddressDisplay address={contractAddress} label="Contract" />
-      <DataRow label="Function" value={functionName} mono />
+      <div className="mb-3">
+        <AddressDisplay address={contractAddress} label="Target Contract" />
+      </div>
+      
+      <DataRow label="Function" value={functionName} mono highlight />
+      
       {isLongResult ? (
-        <div className="pt-2 border-t border-border mt-2">
-          <span className="text-xs text-foreground-muted">Result:</span>
-          <pre className="text-xs font-mono text-foreground mt-1 bg-background-muted p-2 rounded overflow-x-auto max-h-32 overflow-y-auto">
-            {formattedResult}
-          </pre>
+        <div className="pt-2 mt-2 border-t border-border/50">
+          <span className="text-[10px] text-foreground-muted uppercase tracking-wider font-semibold">Result</span>
+          <div className="mt-1 bg-background-tertiary rounded-lg p-3 overflow-x-auto border border-border/50">
+            <pre className="text-xs font-mono text-foreground whitespace-pre-wrap break-all">
+              {formattedResult}
+            </pre>
+          </div>
         </div>
       ) : (
-        <DataRow label="Result" value={formattedResult} highlight mono />
+        <DataRow label="Result" value={formattedResult} highlight mono copyable />
       )}
     </BaseCard>
   );

@@ -6,11 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "pnpm": {
+    "overrides": {
+      "viem": "npm:@midl/viem"
+    }
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.45",
     "@ai-sdk/react": "^3.0.93",
+    "@midl/connectors": "^3.0.3",
+    "@midl/core": "^3.0.3",
+    "@midl/executor": "^3.0.3",
+    "@midl/executor-react": "^3.0.3",
+    "@midl/react": "^3.0.3",
+    "@tanstack/react-query": "^5.90.21",
     "ai": "^6.0.91",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.1",

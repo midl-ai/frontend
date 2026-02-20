@@ -16,11 +16,20 @@ export function RuneBalanceCard({ data }: RuneBalanceCardProps) {
   const { runeId, name, balance, address } = data.data;
 
   return (
-    <BaseCard title="Rune Balance" icon={<Gem className="w-4 h-4" />}>
-      <DataRow label="Rune" value={name} highlight />
-      <DataRow label="Balance" value={balance} mono />
-      <DataRow label="Rune ID" value={runeId} mono />
-      <AddressDisplay address={address} label="Address" />
+    <BaseCard 
+      title="Rune Balance" 
+      icon={<Gem className="w-4 h-4" />}
+      variant="success"
+    >
+      <div className="flex items-center justify-between py-2 border-b border-border/50 mb-2">
+        <span className="font-bold text-foreground text-lg">{name}</span>
+        <span className="text-xs font-mono text-foreground-muted bg-background-tertiary px-2 py-1 rounded">
+          ID: {runeId}
+        </span>
+      </div>
+
+      <DataRow label="Balance" value={balance} highlight mono />
+      <AddressDisplay address={address} label="Holder" />
     </BaseCard>
   );
 }
