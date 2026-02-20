@@ -1,23 +1,31 @@
 import { eq, desc, lt, and } from 'drizzle-orm';
-import { db } from './index';
+import { requireDatabase, isDatabaseConfigured } from './index';
 import { user, chat, message, stream } from './schema';
 import type { NewUser, NewChat, NewMessage, NewStream, Chat, Message } from './schema';
+
+/** Check if database operations are available */
+export function isDatabaseAvailable(): boolean {
+  return isDatabaseConfigured;
+}
 
 // ============================================================================
 // User Queries
 // ============================================================================
 
 export async function getUserById(id: string) {
+  const db = requireDatabase();
   const [result] = await db.select().from(user).where(eq(user.id, id)).limit(1);
   return result ?? null;
 }
 
 export async function getUserByAddress(address: string) {
+  const db = requireDatabase();
   const [result] = await db.select().from(user).where(eq(user.address, address)).limit(1);
   return result ?? null;
 }
 
 export async function createUser(data: NewUser) {
+  const db = requireDatabase();
   const [result] = await db.insert(user).values(data).returning();
   return result;
 }
@@ -35,20 +43,24 @@ export async function getOrCreateUserByAddress(address: string) {
 // ============================================================================
 
 export async function getChatById(id: string) {
+  const db = requireDatabase();
   const [result] = await db.select().from(chat).where(eq(chat.id, id)).limit(1);
   return result ?? null;
 }
 
 export async function createChat(data: NewChat) {
+  const db = requireDatabase();
   const [result] = await db.insert(chat).values(data).returning();
   return result;
 }
 
 export async function updateChatTitle(id: string, title: string) {
+  const db = requireDatabase();
   await db.update(chat).set({ title }).where(eq(chat.id, id));
 }
 
 export async function deleteChat(id: string) {
+  const db = requireDatabase();
   await db.delete(chat).where(eq(chat.id, id));
 }
 
@@ -62,6 +74,8 @@ export async function getChatsByUserId({
   limit?: number;
   startingAfter?: string;
 }): Promise<{ chats: Chat[]; hasMore: boolean; nextCursor: string | null }> {
+  const db = requireDatabase();
+
   let query = db
     .select()
     .from(chat)
@@ -97,10 +111,12 @@ export async function getChatsByUserId({
 // ============================================================================
 
 export async function getMessagesByChatId(chatId: string): Promise<Message[]> {
+  const db = requireDatabase();
   return db.select().from(message).where(eq(message.chatId, chatId)).orderBy(message.createdAt);
 }
 
 export async function createMessage(data: NewMessage) {
+  const db = requireDatabase();
   const [result] = await db.insert(message).values(data).returning();
   return result;
 }
@@ -113,6 +129,7 @@ export async function saveMessages({
   messages: Array<{ id: string; role: string; parts: unknown[] }>;
 }) {
   if (msgs.length === 0) return;
+  const db = requireDatabase();
 
   const values: NewMessage[] = msgs.map((m) => ({
     id: m.id,
@@ -126,6 +143,7 @@ export async function saveMessages({
 }
 
 export async function deleteMessagesByChatId(chatId: string) {
+  const db = requireDatabase();
   await db.delete(message).where(eq(message.chatId, chatId));
 }
 
@@ -134,11 +152,13 @@ export async function deleteMessagesByChatId(chatId: string) {
 // ============================================================================
 
 export async function saveStream(data: NewStream) {
+  const db = requireDatabase();
   const [result] = await db.insert(stream).values(data).returning();
   return result;
 }
 
 export async function getStreamIdsByChatId(chatId: string): Promise<string[]> {
+  const db = requireDatabase();
   const results = await db
     .select({ id: stream.id })
     .from(stream)
@@ -149,6 +169,7 @@ export async function getStreamIdsByChatId(chatId: string): Promise<string[]> {
 }
 
 export async function deleteStreamsByChatId(chatId: string) {
+  const db = requireDatabase();
   await db.delete(stream).where(eq(stream.chatId, chatId));
 }
 

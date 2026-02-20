@@ -13,6 +13,7 @@ import {
   getChatById,
   updateChatTitle,
   getOrCreateUserByAddress,
+  isDatabaseAvailable,
 } from '@/lib/db/queries';
 import { generateUUID } from '@/lib/utils';
 
@@ -33,29 +34,33 @@ export async function POST(request: Request) {
     const evmAddress = request.headers.get('x-evm-address');
     const btcAddress = request.headers.get('x-btc-address');
 
-    // Get or create user if wallet connected
+    // Database operations only if available
+    const dbAvailable = isDatabaseAvailable();
     let userId: string | undefined;
-    if (walletAddress) {
+    let existingChat: Awaited<ReturnType<typeof getChatById>> | null = null;
+
+    if (dbAvailable && walletAddress) {
+      // Get or create user if wallet connected
       const user = await getOrCreateUserByAddress(walletAddress);
       userId = user.id;
-    }
 
-    // Create chat if it doesn't exist
-    const existingChat = await getChatById(chatId);
-    if (!existingChat && userId) {
-      const firstUserMessage = messages.find((m) => m.role === 'user');
-      const firstPart = firstUserMessage?.parts?.[0];
-      const messageText =
-        firstPart && 'text' in firstPart ? firstPart.text : 'New Chat';
-      const title = extractChatTitle(messageText);
+      // Create chat if it doesn't exist
+      existingChat = await getChatById(chatId);
+      if (!existingChat) {
+        const firstUserMessage = messages.find((m) => m.role === 'user');
+        const firstPart = firstUserMessage?.parts?.[0];
+        const messageText =
+          firstPart && 'text' in firstPart ? firstPart.text : 'New Chat';
+        const title = extractChatTitle(messageText);
 
-      await createChat({
-        id: chatId,
-        userId,
-        title,
-        visibility: 'private',
-        createdAt: new Date(),
-      });
+        await createChat({
+          id: chatId,
+          userId,
+          title,
+          visibility: 'private',
+          createdAt: new Date(),
+        });
+      }
     }
 
     // Get system prompt with wallet context
@@ -78,12 +83,15 @@ export async function POST(request: Request) {
       tools,
       stopWhen: stepCountIs(10), // Allow up to 10 tool calling steps
       onFinish: async ({ response }) => {
+        // Skip database operations if not available
+        if (!dbAvailable || !userId) return;
+
         // Save messages to database
         const assistantMessages = response.messages.filter(
           (m) => m.role === 'assistant'
         );
 
-        if (assistantMessages.length > 0 && userId) {
+        if (assistantMessages.length > 0) {
           const messagesToSave = assistantMessages.map((m) => ({
             id: generateUUID(),
             role: m.role,

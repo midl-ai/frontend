@@ -1,13 +1,19 @@
-import { getChatsByUserId, getUserByAddress } from '@/lib/db/queries';
+import { getChatsByUserId, getUserByAddress, isDatabaseAvailable } from '@/lib/db/queries';
 
 export const maxDuration = 30;
 
 /**
  * Get chat history with cursor-based pagination.
  * Requires x-wallet-address header for authentication.
+ * Returns empty list if database is not configured.
  */
 export async function GET(request: Request) {
   try {
+    // Return empty history if database not configured
+    if (!isDatabaseAvailable()) {
+      return Response.json({ chats: [], hasMore: false, nextCursor: null });
+    }
+
     const { searchParams } = new URL(request.url);
     const startingAfter = searchParams.get('starting_after');
     const limit = parseInt(searchParams.get('limit') || '20', 10);
@@ -16,10 +22,7 @@ export async function GET(request: Request) {
     const walletAddress = request.headers.get('x-wallet-address');
 
     if (!walletAddress) {
-      return new Response(
-        JSON.stringify({ error: 'Wallet not connected' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+      return Response.json({ chats: [], hasMore: false, nextCursor: null });
     }
 
     // Get user by wallet address
@@ -39,9 +42,7 @@ export async function GET(request: Request) {
     return Response.json(result);
   } catch (error) {
     console.error('[History API] Error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Failed to fetch chat history' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    // Return empty history instead of error for graceful degradation
+    return Response.json({ chats: [], hasMore: false, nextCursor: null });
   }
 }

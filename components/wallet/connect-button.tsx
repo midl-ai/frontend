@@ -10,10 +10,18 @@ import {
   Check,
   ChevronDown,
   ExternalLink,
+  AlertCircle,
+  Download,
 } from 'lucide-react';
 import { useConnect, useDisconnect, useDefaultAccount } from '@midl/react';
 import { useEVMAddress } from '@midl/executor-react';
 import { AddressPurpose } from '@midl/core';
+
+/** Check if Xverse wallet extension is installed */
+function isXverseInstalled(): boolean {
+  if (typeof window === 'undefined') return false;
+  return !!(window as unknown as { XverseProviders?: unknown }).XverseProviders;
+}
 
 /** Truncate address for display */
 function truncateAddress(address: string, chars = 4): string {
@@ -138,6 +146,8 @@ const WalletDropdown = memo(function WalletDropdown({
 /** Wallet connect button with dropdown using real Xverse connection */
 export function ConnectButton() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Real MIDL SDK hooks - request both Payment and Ordinals addresses
   const { connect, connectors, isPending: isConnecting } = useConnect({
@@ -163,11 +173,26 @@ export function ConnectButton() {
     }
   }, [isConnected, evmAddress, btcAddress]);
 
-  const handleConnect = useCallback(() => {
+  const handleConnect = useCallback(async () => {
+    setError(null);
+
+    // Check if Xverse is installed
+    if (!isXverseInstalled()) {
+      setShowInstallPrompt(true);
+      return;
+    }
+
     // Use Xverse connector (first in the list)
     const xverseConnector = connectors[0];
     if (xverseConnector) {
-      connect({ id: xverseConnector.id });
+      try {
+        await connect({ id: xverseConnector.id });
+      } catch (err) {
+        console.error('Wallet connection error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to connect wallet');
+      }
+    } else {
+      setError('No wallet connector available');
     }
   }, [connect, connectors]);
 
@@ -215,29 +240,107 @@ export function ConnectButton() {
     );
   }
 
+  // Show install prompt
+  if (showInstallPrompt) {
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setShowInstallPrompt(false)}
+          className={cn(
+            'flex items-center gap-2 px-5 py-2 rounded-lg font-medium transition-all',
+            'bg-warning/10 text-warning border border-warning/20'
+          )}
+        >
+          <AlertCircle className="w-4 h-4" />
+          <span>Install Xverse</span>
+        </button>
+
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-border bg-card shadow-lg z-50 overflow-hidden"
+          >
+            <div className="p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                  <Wallet className="w-5 h-5 text-accent" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Xverse Wallet Required</p>
+                  <p className="text-sm text-foreground-muted mt-1">
+                    Install Xverse to connect your Bitcoin wallet to MIDL.
+                  </p>
+                </div>
+              </div>
+              <a
+                href="https://www.xverse.app/download"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-accent text-accent-foreground font-medium hover:bg-accent-hover transition-all"
+              >
+                <Download className="w-4 h-4" />
+                Install Xverse
+              </a>
+              <button
+                onClick={() => setShowInstallPrompt(false)}
+                className="w-full px-4 py-2 text-sm text-foreground-muted hover:text-foreground transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    );
+  }
+
   return (
-    <button
-      onClick={handleConnect}
-      disabled={isConnecting}
-      className={cn(
-        'flex items-center gap-2 px-5 py-2 rounded-lg font-medium transition-all',
-        'bg-accent text-accent-foreground hover:bg-accent-hover',
-        'shadow-sm hover:shadow-glow',
-        isConnecting && 'opacity-80 cursor-wait'
-      )}
-    >
-      {isConnecting ? (
-        <>
-          <div className="w-4 h-4 border-2 border-accent-foreground/30 border-t-accent-foreground rounded-full animate-spin" />
-          <span>Connecting...</span>
-        </>
-      ) : (
-        <>
-          <Wallet className="w-4 h-4" />
-          <span>Connect Wallet</span>
-        </>
-      )}
-    </button>
+    <div className="relative">
+      <button
+        onClick={handleConnect}
+        disabled={isConnecting}
+        className={cn(
+          'flex items-center gap-2 px-5 py-2 rounded-lg font-medium transition-all',
+          'bg-accent text-accent-foreground hover:bg-accent-hover',
+          'shadow-sm hover:shadow-glow',
+          isConnecting && 'opacity-80 cursor-wait',
+          error && 'bg-error/10 text-error border border-error/20'
+        )}
+      >
+        {isConnecting ? (
+          <>
+            <div className="w-4 h-4 border-2 border-accent-foreground/30 border-t-accent-foreground rounded-full animate-spin" />
+            <span>Connecting...</span>
+          </>
+        ) : error ? (
+          <>
+            <AlertCircle className="w-4 h-4" />
+            <span>Try Again</span>
+          </>
+        ) : (
+          <>
+            <Wallet className="w-4 h-4" />
+            <span>Connect Wallet</span>
+          </>
+        )}
+      </button>
+
+      {/* Error tooltip */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            className="absolute right-0 top-full mt-2 w-64 p-3 rounded-lg border border-error/20 bg-error/5 text-sm text-error"
+          >
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
