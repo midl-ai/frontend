@@ -1,13 +1,9 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getNetworkConfig } from '@/lib/midl/config';
+import { getTemplate, getTemplateInfo } from '@/lib/contracts/templates';
+import { compileSolidity } from '@/lib/contracts/compiler';
 import type { ContractDeployTransaction } from '../types';
-
-/** Base URL for internal API calls */
-const getBaseUrl = () => {
-  // In server context, use localhost
-  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-};
 
 export const midl_deploy_contract = tool({
   description:
@@ -34,29 +30,70 @@ export const midl_deploy_contract = tool({
     const config = getNetworkConfig();
 
     try {
-      // Call the compile API
-      const response = await fetch(`${getBaseUrl()}/api/compile`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          template,
-          params,
-          customSource,
-          customContractName,
-        }),
-      });
+      let sourceCode: string;
+      let contractName: string;
 
-      const compileResult = await response.json();
+      // Option 1: Custom source code
+      if (customSource && customContractName) {
+        sourceCode = customSource;
+        contractName = customContractName;
+      }
+      // Option 2: Use template
+      else if (template) {
+        const templateDef = getTemplate(template);
+
+        if (!templateDef) {
+          return {
+            success: false,
+            error: `Unknown template: ${template}`,
+            data: {
+              availableTemplates: getTemplateInfo(),
+            },
+          };
+        }
+
+        // Validate required params
+        const missingParams = templateDef.params
+          .filter((p) => p.required)
+          .filter((p) => !params || !(p.name in params));
+
+        if (missingParams.length > 0) {
+          return {
+            success: false,
+            error: `Missing required parameters: ${missingParams.map((p) => p.name).join(', ')}`,
+            data: {
+              template,
+              requiredParams: templateDef.params,
+              availableTemplates: getTemplateInfo(),
+            },
+          };
+        }
+
+        // Generate source from template
+        const generated = templateDef.generate(params || {});
+        sourceCode = generated.source;
+        contractName = generated.contractName;
+      }
+      // No template or custom source provided
+      else {
+        return {
+          success: false,
+          error: 'Please specify a template or provide custom source code',
+          data: {
+            availableTemplates: getTemplateInfo(),
+          },
+        };
+      }
+
+      // Compile the source code
+      console.log('[deploy-contract] Compiling contract:', contractName);
+      const compileResult = compileSolidity(sourceCode, contractName);
 
       if (!compileResult.success) {
-        // Return validation error with helpful info
         return {
           success: false,
           error: compileResult.error,
           data: {
-            template,
-            requiredParams: compileResult.requiredParams,
-            availableTemplates: compileResult.availableTemplates,
             details: compileResult.details,
           },
         };
