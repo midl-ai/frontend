@@ -317,7 +317,18 @@ export function useHandleTransaction() {
     } catch (error) {
       console.error('[useHandleTransaction] Error:', error);
       setState('error');
-      const errorMsg = error instanceof Error ? error.message : 'Transaction failed';
+
+      // Provide user-friendly error messages
+      let errorMsg = error instanceof Error ? error.message : 'Transaction failed';
+
+      if (errorMsg.includes('No selected UTXOs')) {
+        errorMsg = 'Insufficient BTC balance. Please fund your wallet from the faucet: https://faucet.midl.xyz';
+      } else if (errorMsg.includes('No public client')) {
+        errorMsg = 'Wallet connection error. Please reconnect your wallet.';
+      } else if (errorMsg.includes('No account found')) {
+        errorMsg = 'No wallet account found. Please connect your wallet.';
+      }
+
       const errorResult = { error: errorMsg };
       setResult(errorResult);
       throw error;
