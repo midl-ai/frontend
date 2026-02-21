@@ -13,7 +13,7 @@ import {
   AlertCircle,
   Download,
 } from 'lucide-react';
-import { useConnect, useDisconnect, useDefaultAccount } from '@midl/react';
+import { useConnect, useDisconnect, useAccounts } from '@midl/react';
 import { useEVMAddress } from '@midl/executor-react';
 import { AddressPurpose } from '@midl/core';
 
@@ -149,23 +149,22 @@ export function ConnectButton() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Real MIDL SDK hooks
-  const { connect, connectors, isPending: isConnecting } = useConnect({
+  // Real MIDL SDK hooks - useAccounts is reactive, useDefaultAccount is not
+  const { connect, connectors } = useConnect({
     purposes: [AddressPurpose.Payment, AddressPurpose.Ordinals],
   });
   const { disconnect } = useDisconnect();
-  const account = useDefaultAccount();
+  const { paymentAccount, isConnected, isConnecting } = useAccounts();
   const evmAddress = useEVMAddress();
 
-  // Derive connection state from account
-  const isConnected = !!account;
-  const btcAddress = account?.address;
+  // Use payment account's BTC address as primary identifier
+  const btcAddress = paymentAccount?.address;
   const displayAddress = evmAddress || btcAddress;
 
   // Debug logging
   useEffect(() => {
-    console.log('[Wallet] State:', { isConnected, account, evmAddress, btcAddress });
-  }, [isConnected, account, evmAddress, btcAddress]);
+    console.log('[Wallet] State:', { isConnected, paymentAccount, evmAddress, btcAddress });
+  }, [isConnected, paymentAccount, evmAddress, btcAddress]);
 
   // Persist addresses to localStorage for API calls
   useEffect(() => {

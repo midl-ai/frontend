@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import { useState, memo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useSWR from 'swr';
-import { useDefaultAccount } from '@midl/react';
+import { useAccounts } from '@midl/react';
 import { useEVMAddress } from '@midl/executor-react';
 
 // Types
@@ -181,17 +181,17 @@ export function Sidebar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
 
-  // Get wallet state directly from MIDL hooks (not localStorage)
-  const account = useDefaultAccount();
+  // Get wallet state directly from MIDL hooks - useAccounts is reactive
+  const { paymentAccount, isConnected } = useAccounts();
   const evmAddress = useEVMAddress();
 
-  const isConnected = !!account;
-  const walletAddress = evmAddress || account?.address;
+  // Use payment account's BTC address as primary identifier
+  const walletAddress = evmAddress || paymentAccount?.address;
 
   // Debug logging
   useEffect(() => {
-    console.log('[Sidebar] Wallet state:', { isConnected, account, evmAddress, walletAddress });
-  }, [isConnected, account, evmAddress, walletAddress]);
+    console.log('[Sidebar] Wallet state:', { isConnected, paymentAccount, evmAddress, walletAddress });
+  }, [isConnected, paymentAccount, evmAddress, walletAddress]);
 
   // Fetcher that adds wallet headers
   const fetcher = useCallback(
