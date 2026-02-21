@@ -1,29 +1,32 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getNetworkConfig } from '@/lib/midl/config';
+import type { RuneTransferTransaction } from '../types';
 
 export const midl_transfer_rune = tool({
   description:
-    'Transfer Runes to another Bitcoin address. Creates a Bitcoin transaction with rune transfer.',
+    'Transfer Runes to another Bitcoin address. Returns prepared transaction for wallet signing.',
   inputSchema: z.object({
     runeId: z.string().describe('Rune ID to transfer'),
+    runeName: z.string().optional().describe('Rune name for display'),
     amount: z.string().describe('Amount of runes to transfer'),
     toAddress: z.string().describe('Destination Bitcoin address'),
   }),
-  execute: async ({ runeId, amount, toAddress }) => {
+  execute: async ({ runeId, runeName, amount, toAddress }) => {
     const config = getNetworkConfig();
 
-    // Rune transfer requires wallet - return info for frontend to handle
+    const transaction: RuneTransferTransaction = {
+      type: 'rune_transfer',
+      runeId,
+      runeName,
+      amount,
+      toAddress,
+      explorerUrl: config.mempoolUrl,
+    };
+
     return {
-      success: false,
-      error: 'Rune transfer requires wallet signing. Please connect your wallet.',
-      data: {
-        runeId,
-        amount,
-        toAddress,
-        explorerUrl: config.mempoolUrl,
-        requiresWallet: true,
-      },
+      success: true,
+      transaction,
     };
   },
 });

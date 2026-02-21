@@ -1,10 +1,11 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getNetworkConfig, SATOSHIS_PER_BTC } from '@/lib/midl/config';
+import type { BridgeDepositTransaction } from '../types';
 
 export const midl_bridge_btc_to_evm = tool({
   description:
-    'Bridge BTC from the Bitcoin layer to the EVM layer. Creates a deposit transaction.',
+    'Bridge BTC from the Bitcoin layer to the EVM layer. Returns prepared deposit transaction for wallet signing.',
   inputSchema: z.object({
     amount: z.string().describe('Amount to bridge (in BTC or satoshis)'),
     unit: z
@@ -25,17 +26,16 @@ export const midl_bridge_btc_to_evm = tool({
 
     const btcAmount = (satoshis / SATOSHIS_PER_BTC).toFixed(8);
 
-    // Bridge requires wallet - return info for frontend to handle
+    const transaction: BridgeDepositTransaction = {
+      type: 'bridge_deposit',
+      satoshis: satoshis.toString(),
+      btcAmount,
+      explorerUrl: config.mempoolUrl,
+    };
+
     return {
-      success: false,
-      error: 'Bridge deposit requires wallet signing. Please connect your wallet.',
-      data: {
-        satoshis: satoshis.toString(),
-        btcAmount,
-        explorerUrl: config.mempoolUrl,
-        status: 'pending_wallet',
-        requiresWallet: true,
-      },
+      success: true,
+      transaction,
     };
   },
 });

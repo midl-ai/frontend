@@ -273,3 +273,110 @@ export interface VerifyContractInfo {
   explorerUrl: string;
   message: string;
 }
+
+// ============================================
+// Transaction Types (for client-side signing)
+// ============================================
+
+/** Base transaction type */
+interface BaseTransaction {
+  explorerUrl: string;
+}
+
+/** EVM transfer transaction */
+export interface EVMTransferTransaction extends BaseTransaction {
+  type: 'evm_transfer';
+  to: string;
+  amount: string;
+  amountWei: string;
+}
+
+/** Token transfer transaction */
+export interface TokenTransferTransaction extends BaseTransaction {
+  type: 'token_transfer';
+  tokenAddress: string;
+  to: string;
+  amount: string;
+  amountRaw: string;
+  decimals: number;
+  symbol?: string;
+}
+
+/** Bridge deposit (BTC → EVM) transaction */
+export interface BridgeDepositTransaction extends BaseTransaction {
+  type: 'bridge_deposit';
+  satoshis: string;
+  btcAmount: string;
+}
+
+/** Bridge withdraw (EVM → BTC) transaction */
+export interface BridgeWithdrawTransaction extends BaseTransaction {
+  type: 'bridge_withdraw';
+  satoshis: string;
+  btcAmount: string;
+  btcAddress: string;
+}
+
+/** Contract write transaction */
+export interface ContractWriteTransaction extends BaseTransaction {
+  type: 'contract_write';
+  contractAddress: string;
+  abi: string;
+  functionName: string;
+  args?: string[];
+  value?: string;
+}
+
+/** Contract deploy transaction */
+export interface ContractDeployTransaction extends BaseTransaction {
+  type: 'contract_deploy';
+  template: string;
+  params: Record<string, string>;
+  bytecode?: string;
+}
+
+/** Rune transfer transaction */
+export interface RuneTransferTransaction extends BaseTransaction {
+  type: 'rune_transfer';
+  runeId: string;
+  runeName?: string;
+  amount: string;
+  toAddress: string;
+}
+
+/** Rune to ERC20 bridge transaction */
+export interface RuneToERC20Transaction extends BaseTransaction {
+  type: 'rune_to_erc20';
+  runeId: string;
+  runeName?: string;
+  amount: string;
+}
+
+/** ERC20 to Rune bridge transaction */
+export interface ERC20ToRuneTransaction extends BaseTransaction {
+  type: 'erc20_to_rune';
+  runeId: string;
+  runeName?: string;
+  erc20Address: string;
+  amount: string;
+  btcAddress: string;
+}
+
+/** Union of all transaction types */
+export type PreparedTransaction =
+  | EVMTransferTransaction
+  | TokenTransferTransaction
+  | BridgeDepositTransaction
+  | BridgeWithdrawTransaction
+  | ContractWriteTransaction
+  | ContractDeployTransaction
+  | RuneTransferTransaction
+  | RuneToERC20Transaction
+  | ERC20ToRuneTransaction;
+
+/** Tool response with prepared transaction */
+export interface TransactionToolResponse<T = unknown> {
+  success: true;
+  transaction: PreparedTransaction;
+  data?: T;
+}

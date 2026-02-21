@@ -1,6 +1,8 @@
 import {
   streamText,
   convertToModelMessages,
+  createUIMessageStream,
+  JsonToSseTransformStream,
   stepCountIs,
   type UIMessage,
 } from 'ai';
@@ -89,68 +91,40 @@ export async function POST(request: Request) {
     // Convert UI messages to model messages
     const modelMessages = await convertToModelMessages(messages);
 
-    // Create streaming response with tools
-    const result = streamText({
-      model: getModelProvider()(getDefaultModel()),
-      system: systemPrompt,
-      messages: modelMessages,
-      tools,
-      stopWhen: stepCountIs(10),
-      onFinish: async ({ response }) => {
+    // Create UI message stream (like VeChain/Stacks pattern)
+    // This gives us { messages } in onFinish with full parts including tool outputs
+    const stream = createUIMessageStream({
+      execute: ({ writer }) => {
+        const result = streamText({
+          model: getModelProvider()(getDefaultModel()),
+          system: systemPrompt,
+          messages: modelMessages,
+          tools,
+          toolChoice: 'auto',
+          stopWhen: stepCountIs(10),
+        });
+
+        result.consumeStream();
+        writer.merge(result.toUIMessageStream());
+      },
+      generateId: generateUUID,
+      onFinish: async ({ messages: responseMessages }) => {
         if (!userId) return;
 
-        // Build a map of tool call ID to output from tool messages
-        const toolOutputMap = new Map<string, unknown>();
-        for (const msg of response.messages) {
-          if (msg.role === 'tool' && Array.isArray(msg.content)) {
-            for (const part of msg.content) {
-              if (part.type === 'tool-result' && part.toolCallId) {
-                toolOutputMap.set(part.toolCallId, part.output);
-              }
-            }
-          }
-        }
-
-        // Save assistant messages to database
-        const assistantMessages = response.messages.filter(
+        // Save all assistant messages with full parts (includes tool outputs)
+        // VeChain/Stacks pattern: JSON.stringify(message.parts) directly
+        const assistantMessages = responseMessages.filter(
           (m) => m.role === 'assistant'
         );
 
         if (assistantMessages.length > 0) {
-          // Convert model messages to UI format for storage
-          const messagesToSave = assistantMessages.map((m) => {
-            // Convert content array to parts format
-            const parts = Array.isArray(m.content)
-              ? m.content.map((c) => {
-                  if (c.type === 'text') {
-                    return { type: 'text' as const, text: c.text };
-                  }
-                  if (c.type === 'tool-call') {
-                    // Look up the tool output from our map
-                    const output = toolOutputMap.get(c.toolCallId) ?? null;
-                    return {
-                      type: `tool-${c.toolName}` as const,
-                      toolCallId: c.toolCallId,
-                      toolName: c.toolName,
-                      state: 'output-available' as const,
-                      input: (c as { input?: unknown }).input || {},
-                      output,
-                    };
-                  }
-                  return c;
-                })
-              : [{ type: 'text' as const, text: String(m.content) }];
-
-            return {
-              id: generateUUID(),
-              role: m.role,
-              parts,
-            };
-          });
-
           await saveMessages({
             chatId,
-            messages: messagesToSave,
+            messages: assistantMessages.map((message) => ({
+              id: message.id,
+              role: message.role,
+              parts: message.parts,
+            })),
           });
 
           // Update chat title if this is the first response
@@ -165,10 +139,14 @@ export async function POST(request: Request) {
           }
         }
       },
+      onError: (error) => {
+        console.error('[Chat API] Stream error:', error);
+        return 'An error occurred while processing your request.';
+      },
     });
 
-    // Return UI message stream response
-    return result.toUIMessageStreamResponse();
+    // Return the stream response (pipe through SSE transform)
+    return new Response(stream.pipeThrough(new JsonToSseTransformStream()));
   } catch (error) {
     console.error('[Chat API] Error:', error);
     return new Response(

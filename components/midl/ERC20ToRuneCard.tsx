@@ -1,11 +1,23 @@
 'use client';
 
 import { ArrowRightLeft, ExternalLink } from 'lucide-react';
-import { BaseCard, ErrorCard, DataRow } from './base';
-import type { ToolResponse, RuneBridgeInfo } from '@/lib/ai/tools/types';
+import { BaseCard, ErrorCard, DataRow, AddressDisplay } from './base';
+import { TransactionWrapper } from '@/components/transactions';
+import type { ToolResponse, ERC20ToRuneTransaction } from '@/lib/ai/tools/types';
+
+interface ERC20ToRuneToolResult {
+  transaction?: ERC20ToRuneTransaction;
+  btcTxId?: string;
+  runeId?: string;
+  amount?: string;
+  erc20Address?: string;
+  btcAddress?: string;
+  explorerUrl?: string;
+  status?: string;
+}
 
 interface ERC20ToRuneCardProps {
-  data: ToolResponse<RuneBridgeInfo>;
+  data: ToolResponse<ERC20ToRuneToolResult>;
 }
 
 export function ERC20ToRuneCard({ data }: ERC20ToRuneCardProps) {
@@ -13,28 +25,60 @@ export function ERC20ToRuneCard({ data }: ERC20ToRuneCardProps) {
     return <ErrorCard error={data.error || 'ERC20 to Rune bridge failed'} toolName="ERC20 → Rune" />;
   }
 
-  const { btcTxId, runeId, amount, explorerUrl, status } = data.data;
+  const { transaction, btcTxId } = data.data;
 
-  return (
-    <BaseCard
-      title="ERC20 → Rune Bridge"
-      icon={<ArrowRightLeft className="w-4 h-4" />}
-      variant={status === 'pending' ? 'warning' : 'success'}
-    >
-      <DataRow label="Rune ID" value={runeId} />
-      <DataRow label="Amount" value={amount} highlight />
-      <DataRow label="Status" value={status} />
-      <DataRow label="BTC TX" value={`${btcTxId.slice(0, 12)}...${btcTxId.slice(-8)}`} mono />
-      <div className="pt-2">
-        <a
-          href={explorerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-accent hover:underline flex items-center gap-1"
-        >
-          View on Explorer <ExternalLink className="w-3 h-3" />
-        </a>
-      </div>
-    </BaseCard>
-  );
+  // Show signing UI when we have a prepared transaction
+  if (transaction && !btcTxId) {
+    return (
+      <BaseCard title="ERC20 → Rune Bridge" icon={<ArrowRightLeft className="w-4 h-4" />} variant="default">
+        <TransactionWrapper transaction={transaction} buttonText="Sign & Bridge">
+          <div className="space-y-2 mb-3">
+            <DataRow label="Rune ID" value={transaction.runeId} mono />
+            {transaction.runeName && (
+              <DataRow label="Rune" value={transaction.runeName} highlight />
+            )}
+            <DataRow label="Amount" value={transaction.amount} highlight />
+            <AddressDisplay address={transaction.erc20Address} label="ERC20 Token" />
+            <AddressDisplay address={transaction.btcAddress} label="BTC Recipient" />
+          </div>
+        </TransactionWrapper>
+      </BaseCard>
+    );
+  }
+
+  // Show success receipt
+  if (btcTxId) {
+    const { runeId, amount, erc20Address, btcAddress, explorerUrl, status } = data.data;
+    return (
+      <BaseCard
+        title="ERC20 → Rune Bridge"
+        icon={<ArrowRightLeft className="w-4 h-4" />}
+        explorerLink={explorerUrl}
+        variant={status === 'pending' ? 'warning' : 'success'}
+      >
+        <DataRow label="Rune ID" value={runeId || ''} mono />
+        <DataRow label="Amount" value={amount || ''} highlight />
+        <DataRow
+          label="Status"
+          value={(status || 'pending').toUpperCase()}
+          className={status === 'pending' ? 'text-warning' : 'text-success'}
+        />
+        {erc20Address && <AddressDisplay address={erc20Address} label="ERC20 Token" />}
+        {btcAddress && <AddressDisplay address={btcAddress} label="BTC Recipient" />}
+        <DataRow label="BTC TX" value={btcTxId} mono copyable />
+        <div className="pt-2">
+          <a
+            href={explorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-accent hover:underline flex items-center gap-1"
+          >
+            View on Explorer <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      </BaseCard>
+    );
+  }
+
+  return <ErrorCard error="Invalid ERC20 to Rune bridge data" toolName="ERC20 → Rune" />;
 }

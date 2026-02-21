@@ -1,10 +1,11 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getNetworkConfig } from '@/lib/midl/config';
+import type { ContractWriteTransaction } from '../types';
 
 export const midl_write_contract = tool({
   description:
-    'Write to a smart contract. Requires wallet signing. This action modifies blockchain state.',
+    'Write to a smart contract. Returns prepared transaction for wallet signing. Modifies blockchain state.',
   inputSchema: z.object({
     address: z.string().describe('Contract address'),
     abi: z.string().describe('Contract ABI as JSON string'),
@@ -18,21 +19,22 @@ export const midl_write_contract = tool({
       .optional()
       .describe('Value to send in wei (for payable functions)'),
   }),
-  execute: async ({ address, functionName }) => {
-    // Note: Write operations require wallet integration
-    // This returns a placeholder that the frontend will handle
+  execute: async ({ address, abi, functionName, args, value }) => {
     const config = getNetworkConfig();
 
+    const transaction: ContractWriteTransaction = {
+      type: 'contract_write',
+      contractAddress: address,
+      abi,
+      functionName,
+      args,
+      value,
+      explorerUrl: `${config.explorerUrl}/address/${address}`,
+    };
+
     return {
-      success: false,
-      error:
-        'Contract write operations require wallet signing. Please connect your wallet and try again.',
-      data: {
-        contractAddress: address,
-        functionName,
-        explorerUrl: `${config.explorerUrl}/address/${address}`,
-        requiresWallet: true,
-      },
+      success: true,
+      transaction,
     };
   },
 });

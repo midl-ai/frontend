@@ -1,6 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getNetworkConfig } from '@/lib/midl/config';
+import type { ContractDeployTransaction } from '../types';
 
 /** Available contract templates */
 const TEMPLATES = {
@@ -23,7 +24,7 @@ const TEMPLATES = {
 
 export const midl_deploy_contract = tool({
   description:
-    'Deploy a smart contract to the MIDL EVM layer. Supports templates or custom bytecode.',
+    'Deploy a smart contract to the MIDL EVM layer. Returns prepared deployment transaction for wallet signing.',
   inputSchema: z.object({
     template: z
       .enum(['erc20', 'counter', 'storage'])
@@ -42,7 +43,7 @@ export const midl_deploy_contract = tool({
       .optional()
       .describe('Custom contract ABI as JSON. Required with customBytecode.'),
   }),
-  execute: async ({ template, params }) => {
+  execute: async ({ template, params, customBytecode }) => {
     const config = getNetworkConfig();
 
     // Validate template params if using template
@@ -59,27 +60,28 @@ export const midl_deploy_contract = tool({
           data: {
             template,
             requiredParams: templateDef.params,
+            availableTemplates: Object.entries(TEMPLATES).map(([key, val]) => ({
+              id: key,
+              name: val.name,
+              description: val.description,
+              params: val.params,
+            })),
           },
         };
       }
     }
 
-    // Deployment requires wallet - return info for frontend to handle
+    const transaction: ContractDeployTransaction = {
+      type: 'contract_deploy',
+      template: template || 'custom',
+      params: params || {},
+      bytecode: customBytecode,
+      explorerUrl: config.explorerUrl,
+    };
+
     return {
-      success: false,
-      error: 'Contract deployment requires wallet signing. Please connect your wallet.',
-      data: {
-        template,
-        params,
-        explorerUrl: config.explorerUrl,
-        requiresWallet: true,
-        availableTemplates: Object.entries(TEMPLATES).map(([key, val]) => ({
-          id: key,
-          name: val.name,
-          description: val.description,
-          params: val.params,
-        })),
-      },
+      success: true,
+      transaction,
     };
   },
 });
