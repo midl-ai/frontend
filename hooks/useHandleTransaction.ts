@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useAccounts, useEdictRune } from '@midl/react';
 import {
   useAddTxIntention,
-  useSignIntention,
+  useSignIntentions,
   useFinalizeBTCTransaction,
   useSendBTCTransactions,
   useAddCompleteTxIntention,
@@ -34,7 +34,7 @@ export function useHandleTransaction() {
 
   // MIDL SDK hooks
   const { addTxIntentionAsync, txIntentions } = useAddTxIntention();
-  const { signIntentionAsync } = useSignIntention();
+  const { signIntentionsAsync } = useSignIntentions();
   const { finalizeBTCTransactionAsync } = useFinalizeBTCTransaction();
   const { sendBTCTransactionsAsync } = useSendBTCTransactions();
   const { addCompleteTxIntentionAsync } = useAddCompleteTxIntention();
@@ -80,26 +80,20 @@ export function useHandleTransaction() {
 
     setState('signing');
 
-    // Step 2: Sign each intention
+    // Step 2: Sign all intentions at once (uses internal store references)
+    // signIntentionsAsync returns the signed transactions directly
     console.log('[useHandleTransaction] Signing intentions...');
-    for (const intention of txIntentions) {
-      console.log('[useHandleTransaction] Signing intention:', intention);
-      await signIntentionAsync({
-        intention,
-        txId: btcTxId,
-      });
-    }
+    const signedTxs = await signIntentionsAsync({
+      txId: btcTxId,
+    });
 
     setState('broadcasting');
 
     // Step 3: Broadcast
-    console.log('[useHandleTransaction] Broadcasting...');
-    const signedTxs = txIntentions
-      .filter(it => it.signedEvmTransaction)
-      .map(it => it.signedEvmTransaction as `0x${string}`);
+    console.log('[useHandleTransaction] Broadcasting, signedTxs:', signedTxs);
 
     await sendBTCTransactionsAsync({
-      serializedTransactions: signedTxs,
+      serializedTransactions: signedTxs as `0x${string}`[],
       btcTransaction: btcTxHex,
     });
 
@@ -112,7 +106,7 @@ export function useHandleTransaction() {
       btcTxId,
       explorerUrl: `${explorerUrl}/tx/${btcTxId}`,
     };
-  }, [txIntentions, finalizeBTCTransactionAsync, signIntentionAsync, sendBTCTransactionsAsync, clearTxIntentions]);
+  }, [txIntentions, finalizeBTCTransactionAsync, signIntentionsAsync, sendBTCTransactionsAsync, clearTxIntentions]);
 
   /**
    * Execute transaction based on prepared data
