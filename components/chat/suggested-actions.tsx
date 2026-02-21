@@ -245,20 +245,24 @@ const ActionCard = memo(function ActionCard({
 interface CategoryTabProps {
   category: Category;
   isActive: boolean;
-  onClick: () => void;
+  onCategoryClick: (id: string) => void;
 }
 
 const CategoryTab = memo(function CategoryTab({
   category,
   isActive,
-  onClick,
+  onCategoryClick,
 }: CategoryTabProps) {
   const Icon = category.icon;
   const colors = colorClasses[category.color as keyof typeof colorClasses];
 
+  const handleClick = useCallback(() => {
+    onCategoryClick(category.id);
+  }, [onCategoryClick, category.id]);
+
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       data-active={isActive}
       className={cn(
         'flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-medium whitespace-nowrap transition-all',
@@ -286,6 +290,10 @@ export function SuggestedActions({ onSelect }: SuggestedActionsProps) {
     [onSelect]
   );
 
+  const handleCategoryClick = useCallback((id: string) => {
+    setActiveCategory(id);
+  }, []);
+
   const currentCategory = CATEGORIES.find((c) => c.id === activeCategory) ?? CATEGORIES[0];
 
   return (
@@ -303,7 +311,7 @@ export function SuggestedActions({ onSelect }: SuggestedActionsProps) {
             key={category.id}
             category={category}
             isActive={activeCategory === category.id}
-            onClick={() => setActiveCategory(category.id)}
+            onCategoryClick={handleCategoryClick}
           />
         ))}
       </div>
