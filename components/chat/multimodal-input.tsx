@@ -12,6 +12,8 @@ interface MultimodalInputProps {
   stop: () => void;
   /** Voice mode status */
   voiceActive?: boolean;
+  /** Voice connecting status */
+  voiceConnecting?: boolean;
   /** Voice mode toggle handler */
   onVoiceToggle?: () => void;
 }
@@ -23,6 +25,7 @@ export function MultimodalInput({
   isLoading,
   stop,
   voiceActive = false,
+  voiceConnecting = false,
   onVoiceToggle,
 }: MultimodalInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -111,15 +114,18 @@ export function MultimodalInput({
             <button
               type="button"
               onClick={onVoiceToggle}
-              disabled={isLoading}
+              disabled={isLoading || voiceConnecting}
               className={cn(
                 'flex items-center justify-center w-10 h-10 rounded-xl transition-all',
                 'border shadow-sm',
+                voiceConnecting && 'animate-pulse',
                 voiceActive
                   ? 'bg-accent text-accent-foreground border-accent'
-                  : 'bg-background-tertiary text-foreground-muted border-border hover:border-border-hover'
+                  : voiceConnecting
+                    ? 'bg-accent/50 text-accent-foreground border-accent/50'
+                    : 'bg-background-tertiary text-foreground-muted border-border hover:border-border-hover'
               )}
-              title={voiceActive ? 'Stop voice mode' : 'Start voice mode'}
+              title={voiceConnecting ? 'Connecting...' : voiceActive ? 'Stop voice mode' : 'Start voice mode'}
             >
               {voiceActive ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
             </button>

@@ -95,13 +95,23 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
     [sendMessage]
   );
 
-  // Voice mode toggle
+  // Voice mode toggle - prevent multiple sessions
   const handleVoiceToggle = useCallback(() => {
+    // Prevent action if already connecting
+    if (voice.status === 'connecting') {
+      return;
+    }
+
     if (voice.isActive) {
       voice.stopSession();
       setShowVoiceOverlay(false);
     } else {
-      voice.startSession(voiceContacts);
+      // Get wallet addresses from localStorage for tool execution
+      const walletContext = {
+        evmAddress: localStorage.getItem('evmAddress') || undefined,
+        btcAddress: localStorage.getItem('btcAddress') || undefined,
+      };
+      voice.startSession(voiceContacts, walletContext);
       setShowVoiceOverlay(true);
     }
   }, [voice, voiceContacts]);
@@ -150,6 +160,7 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
             isLoading={isLoading}
             stop={stop}
             voiceActive={voice.isActive}
+            voiceConnecting={voice.status === 'connecting'}
             onVoiceToggle={handleVoiceToggle}
           />
         </div>

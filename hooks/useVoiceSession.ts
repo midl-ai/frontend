@@ -39,6 +39,12 @@ export interface VoiceContact {
   btcAddress?: string;
 }
 
+/** Wallet context for tool execution */
+export interface WalletContext {
+  evmAddress?: string;
+  btcAddress?: string;
+}
+
 /** Hook return type */
 export interface UseVoiceSessionReturn {
   status: VoiceSessionStatus;
@@ -49,7 +55,7 @@ export interface UseVoiceSessionReturn {
   currentVolume: number;
   error: string | null;
   pendingTransaction: PreparedTransaction | null;
-  startSession: (contacts?: VoiceContact[]) => Promise<void>;
+  startSession: (contacts?: VoiceContact[], walletContext?: WalletContext) => Promise<void>;
   stopSession: () => void;
   onTransactionComplete: (result: { success: boolean; txHash?: string; error?: string }) => void;
   onTransactionCancel: () => void;
@@ -76,6 +82,9 @@ export function useVoiceSession(): UseVoiceSessionReturn {
   // Transaction state
   const [pendingTransaction, setPendingTransaction] = useState<PreparedTransaction | null>(null);
   const pendingToolCallRef = useRef<PendingToolCall | null>(null);
+
+  // Wallet context for tool execution
+  const walletContextRef = useRef<WalletContext | null>(null);
 
   // WebRTC refs
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
@@ -180,10 +189,16 @@ export function useVoiceSession(): UseVoiceSessionReturn {
   const executeTool = useCallback(async (name: string, args: Record<string, unknown>): Promise<ToolResult> => {
     console.log('[voice] Executing tool via API:', name, args);
 
+    // Build headers with wallet context
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    const wallet = walletContextRef.current;
+    if (wallet?.evmAddress) headers['x-evm-address'] = wallet.evmAddress;
+    if (wallet?.btcAddress) headers['x-btc-address'] = wallet.btcAddress;
+
     try {
       const response = await fetch('/api/voice/execute-tool', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ name, arguments: args }),
       });
 
@@ -396,11 +411,14 @@ export function useVoiceSession(): UseVoiceSessionReturn {
 
   /** Start voice session */
   const startSession = useCallback(
-    async (contacts: VoiceContact[] = []) => {
+    async (contacts: VoiceContact[] = [], walletContext?: WalletContext) => {
       try {
         setStatus('connecting');
         setError(null);
         setTranscript([]);
+
+        // Store wallet context for tool execution
+        walletContextRef.current = walletContext || null;
 
         // Request microphone
         console.log('[voice] Requesting microphone...');
@@ -463,6 +481,28 @@ export function useVoiceSession(): UseVoiceSessionReturn {
 
         dataChannel.onopen = () => {
           console.log('[voice] Data channel open');
+
+          // Send session.update to configure the session after connection
+          // This ensures proper turn detection and prevents multiple responses
+          const sessionUpdate = {
+            type: 'session.update',
+            session: {
+              modalities: ['text', 'audio'],
+              input_audio_transcription: {
+                model: 'whisper-1',
+              },
+              turn_detection: {
+                type: 'server_vad',
+                threshold: 0.5,
+                prefix_padding_ms: 300,
+                silence_duration_ms: 800, // Increased to prevent premature cutoffs
+                create_response: true,
+              },
+            },
+          };
+          dataChannel.send(JSON.stringify(sessionUpdate));
+          console.log('[voice] Session update sent');
+
           setStatus('connected');
         };
 
