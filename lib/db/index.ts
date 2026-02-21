@@ -2,29 +2,36 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 
-const connectionString = process.env.DATABASE_URL;
+// Lazy initialization to avoid build-time errors
+let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
-/** Whether the database is configured */
-export const isDatabaseConfigured = !!connectionString;
+function getConnectionString(): string {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error(
+      'DATABASE_URL is required. Run "docker-compose up -d" to start PostgreSQL.'
+    );
+  }
+  return connectionString;
+}
 
-// Create postgres client only if DATABASE_URL is set
-const client = connectionString
-  ? postgres(connectionString, {
+/** Get database instance (lazy initialization) */
+export function getDb() {
+  if (!_db) {
+    const connectionString = getConnectionString();
+    const client = postgres(connectionString, {
       max: 10,
       idle_timeout: 20,
       connect_timeout: 10,
-    })
-  : null;
-
-// Create drizzle instance with schema (or null if no database)
-export const db = client ? drizzle(client, { schema }) : null;
-
-export type Database = NonNullable<typeof db>;
-
-/** Helper to check if database is available before queries */
-export function requireDatabase(): Database {
-  if (!db) {
-    throw new Error('Database not configured. Set DATABASE_URL environment variable.');
+    });
+    _db = drizzle(client, { schema });
   }
-  return db;
+  return _db;
 }
+
+// Export db as a getter for backwards compatibility
+export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
+  get(_, prop) {
+    return Reflect.get(getDb(), prop);
+  },
+});

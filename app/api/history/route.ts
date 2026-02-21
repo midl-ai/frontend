@@ -1,19 +1,13 @@
-import { getChatsByUserId, getUserByAddress, isDatabaseAvailable } from '@/lib/db/queries';
+import { getChatsByUserId, getUserByAddress } from '@/lib/db/queries';
 
 export const maxDuration = 30;
 
 /**
  * Get chat history with cursor-based pagination.
  * Requires x-wallet-address header for authentication.
- * Returns empty list if database is not configured.
  */
 export async function GET(request: Request) {
   try {
-    // Return empty history if database not configured
-    if (!isDatabaseAvailable()) {
-      return Response.json({ chats: [], hasMore: false, nextCursor: null });
-    }
-
     const { searchParams } = new URL(request.url);
     const startingAfter = searchParams.get('starting_after');
     const limit = parseInt(searchParams.get('limit') || '20', 10);
@@ -42,7 +36,9 @@ export async function GET(request: Request) {
     return Response.json(result);
   } catch (error) {
     console.error('[History API] Error:', error);
-    // Return empty history instead of error for graceful degradation
-    return Response.json({ chats: [], hasMore: false, nextCursor: null });
+    return new Response(
+      JSON.stringify({ error: 'Failed to fetch chat history' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
   }
 }

@@ -13,7 +13,6 @@ import {
   getChatById,
   updateChatTitle,
   getOrCreateUserByAddress,
-  isDatabaseAvailable,
 } from '@/lib/db/queries';
 import { generateUUID } from '@/lib/utils';
 
@@ -34,13 +33,11 @@ export async function POST(request: Request) {
     const evmAddress = request.headers.get('x-evm-address');
     const btcAddress = request.headers.get('x-btc-address');
 
-    // Database operations only if available
-    const dbAvailable = isDatabaseAvailable();
+    // Get or create user if wallet connected
     let userId: string | undefined;
     let existingChat: Awaited<ReturnType<typeof getChatById>> | null = null;
 
-    if (dbAvailable && walletAddress) {
-      // Get or create user if wallet connected
+    if (walletAddress) {
       const user = await getOrCreateUserByAddress(walletAddress);
       userId = user.id;
 
@@ -83,8 +80,7 @@ export async function POST(request: Request) {
       tools,
       stopWhen: stepCountIs(10), // Allow up to 10 tool calling steps
       onFinish: async ({ response }) => {
-        // Skip database operations if not available
-        if (!dbAvailable || !userId) return;
+        if (!userId) return;
 
         // Save messages to database
         const assistantMessages = response.messages.filter(
