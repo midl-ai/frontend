@@ -79,9 +79,13 @@ export const midl_deploy_contract = tool({
       explorerUrl: config.explorerUrl,
     };
 
+    console.log('[deploy-contract] Returning transaction:', transaction);
+
     return {
       success: true,
-      transaction,
+      data: {
+        transaction,
+      },
     };
   },
 });

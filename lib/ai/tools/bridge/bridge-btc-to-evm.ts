@@ -33,9 +33,13 @@ export const midl_bridge_btc_to_evm = tool({
       explorerUrl: config.mempoolUrl,
     };
 
+    console.log('[bridge-btc-to-evm] Returning transaction:', transaction);
+
     return {
       success: true,
-      transaction,
+      data: {
+        transaction,
+      },
     };
   },
 });

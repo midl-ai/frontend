@@ -50,8 +50,17 @@ interface ToolResultRendererProps {
 
 /** Maps tool names to their corresponding card components */
 export function ToolResultRenderer({ toolName, result }: ToolResultRendererProps) {
+  // DEBUG: Log what we receive
+  console.log(`[ToolResultRenderer] Tool: ${toolName}`, {
+    result,
+    resultType: typeof result,
+    isNull: result === null,
+    isUndefined: result === undefined,
+  });
+
   // Handle null/undefined result (e.g., when loading from history with missing output)
   if (result === null || result === undefined) {
+    console.log(`[ToolResultRenderer] ${toolName}: result is null/undefined`);
     return (
       <ErrorCard
         error="Tool result not available. This may happen when loading from history."
@@ -62,6 +71,14 @@ export function ToolResultRenderer({ toolName, result }: ToolResultRendererProps
 
   // Cast result to ToolResponse for type safety
   const data = result as ToolResponse<unknown>;
+
+  // DEBUG: Log the parsed data
+  console.log(`[ToolResultRenderer] ${toolName}: parsed data`, {
+    success: data.success,
+    hasData: !!data.data,
+    data: data.data,
+    error: data.error,
+  });
 
   // Route to appropriate card based on tool name
   switch (toolName) {

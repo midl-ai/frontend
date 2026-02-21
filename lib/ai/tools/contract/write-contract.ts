@@ -32,9 +32,13 @@ export const midl_write_contract = tool({
       explorerUrl: `${config.explorerUrl}/address/${address}`,
     };
 
+    console.log('[write-contract] Returning transaction:', transaction);
+
     return {
       success: true,
-      transaction,
+      data: {
+        transaction,
+      },
     };
   },
 });

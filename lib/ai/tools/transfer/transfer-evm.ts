@@ -36,9 +36,13 @@ export const midl_transfer_evm = tool({
       explorerUrl: config.explorerUrl,
     };
 
+    console.log('[transfer-evm] Returning transaction:', transaction);
+
     return {
       success: true,
-      transaction,
+      data: {
+        transaction,
+      },
     };
   },
 });

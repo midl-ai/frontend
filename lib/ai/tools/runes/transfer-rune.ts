@@ -24,9 +24,13 @@ export const midl_transfer_rune = tool({
       explorerUrl: config.mempoolUrl,
     };
 
+    console.log('[transfer-rune] Returning transaction:', transaction);
+
     return {
       success: true,
-      transaction,
+      data: {
+        transaction,
+      },
     };
   },
 });

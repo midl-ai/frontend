@@ -22,9 +22,13 @@ export const midl_bridge_rune_to_erc20 = tool({
       explorerUrl: config.mempoolUrl,
     };
 
+    console.log('[bridge-rune-to-erc20] Returning transaction:', transaction);
+
     return {
       success: true,
-      transaction,
+      data: {
+        transaction,
+      },
     };
   },
 });

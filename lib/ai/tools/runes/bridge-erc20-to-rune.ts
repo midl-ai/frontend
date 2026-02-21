@@ -26,9 +26,13 @@ export const midl_bridge_erc20_to_rune = tool({
       explorerUrl: config.explorerUrl,
     };
 
+    console.log('[bridge-erc20-to-rune] Returning transaction:', transaction);
+
     return {
       success: true,
-      transaction,
+      data: {
+        transaction,
+      },
     };
   },
 });

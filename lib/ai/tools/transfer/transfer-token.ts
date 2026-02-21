@@ -32,9 +32,13 @@ export const midl_transfer_token = tool({
       explorerUrl: `${config.explorerUrl}/token/${tokenAddress}`,
     };
 
+    console.log('[transfer-token] Returning transaction:', transaction);
+
     return {
       success: true,
-      transaction,
+      data: {
+        transaction,
+      },
     };
   },
 });
