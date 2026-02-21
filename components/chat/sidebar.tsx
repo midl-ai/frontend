@@ -190,16 +190,32 @@ export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   const [hasWallet, setHasWallet] = useState(false);
 
-  // Check wallet on mount (client-side only)
+  // Check wallet on mount and listen for storage changes
   useEffect(() => {
-    setHasWallet(!!localStorage.getItem('walletAddress'));
+    const checkWallet = () => {
+      setHasWallet(!!localStorage.getItem('walletAddress'));
+    };
+
+    // Initial check
+    checkWallet();
+
+    // Listen for storage changes (when wallet connects/disconnects)
+    window.addEventListener('storage', checkWallet);
+
+    // Also poll for changes (for same-tab updates)
+    const interval = setInterval(checkWallet, 1000);
+
+    return () => {
+      window.removeEventListener('storage', checkWallet);
+      clearInterval(interval);
+    };
   }, []);
 
   // Fetch history with SWR
   const { data, isLoading, mutate } = useSWR<HistoryResponse>(
     hasWallet ? '/api/history?limit=50' : null,
     fetcher,
-    { revalidateOnFocus: false }
+    { revalidateOnFocus: true, refreshInterval: hasWallet ? 5000 : 0 }
   );
 
   const handleDelete = useCallback(

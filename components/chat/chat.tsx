@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useChat, type UIMessage } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
+import { useSWRConfig } from 'swr';
 import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
 import { SuggestedActions } from './suggested-actions';
@@ -15,6 +17,11 @@ interface ChatProps {
 
 export function Chat({ id, initialMessages = [] }: ChatProps) {
   const [input, setInput] = useState('');
+  const router = useRouter();
+  const pathname = usePathname();
+  const { mutate } = useSWRConfig();
+  const hasUpdatedUrl = useRef(false);
+  const isNewChat = pathname === '/chat';
 
   const { messages, sendMessage, status, stop } = useChat({
     id,
@@ -38,10 +45,25 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
       },
       body: { id },
     }),
+    onFinish: () => {
+      // Revalidate chat history in sidebar after message completes
+      mutate('/api/history?limit=50');
+    },
   });
 
   const isLoading = status === 'streaming' || status === 'submitted';
   const isEmpty = messages.length === 0;
+
+  // Update URL to /chat/[id] after first message on new chat
+  useEffect(() => {
+    if (isNewChat && messages.length > 0 && !hasUpdatedUrl.current) {
+      hasUpdatedUrl.current = true;
+      // Use replaceState to update URL without navigation
+      window.history.replaceState({}, '', `/chat/${id}`);
+      // Mutate history to show the new chat in sidebar
+      mutate('/api/history?limit=50');
+    }
+  }, [isNewChat, messages.length, id, mutate]);
 
   const handleSubmit = useCallback(
     (text: string) => {
@@ -69,7 +91,7 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
               <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto border border-accent/20">
                 <Terminal className="w-8 h-8 text-accent" />
               </div>
-              
+
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">
                   MIDL Terminal
