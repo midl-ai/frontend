@@ -4,7 +4,7 @@ import {
   stepCountIs,
   type UIMessage,
 } from 'ai';
-import { getAnthropicProvider, DEFAULT_MODEL } from '@/lib/ai/providers';
+import { getModelProvider, getDefaultModel } from '@/lib/ai/providers';
 import { getSystemPrompt, extractChatTitle } from '@/lib/ai/prompts';
 import { getMidlTools } from '@/lib/ai/tools';
 import {
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
 
     // Create streaming response with tools
     const result = streamText({
-      model: getAnthropicProvider()(DEFAULT_MODEL),
+      model: getModelProvider()(getDefaultModel()),
       system: systemPrompt,
       messages: modelMessages,
       tools,
