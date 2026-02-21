@@ -106,6 +106,7 @@ export const midl_deploy_contract = tool({
         params: params || {},
         bytecode: compileResult.bytecode,
         explorerUrl: config.explorerUrl,
+        mempoolUrl: config.mempoolUrl,
       };
 
       console.log('[deploy-contract] Compiled successfully, bytecode length:', compileResult.bytecode.length);

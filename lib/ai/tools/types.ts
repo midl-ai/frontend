@@ -280,7 +280,10 @@ export interface VerifyContractInfo {
 
 /** Base transaction type */
 interface BaseTransaction {
+  /** EVM explorer URL (Blockscout) */
   explorerUrl: string;
+  /** BTC explorer URL (Mempool) */
+  mempoolUrl: string;
 }
 
 /** EVM transfer transaction */

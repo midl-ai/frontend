@@ -21,7 +21,8 @@ export const midl_transfer_rune = tool({
       runeName,
       amount,
       toAddress,
-      explorerUrl: config.mempoolUrl,
+      explorerUrl: config.explorerUrl,
+      mempoolUrl: config.mempoolUrl,
     };
 
     console.log('[transfer-rune] Returning transaction:', transaction);

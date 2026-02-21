@@ -34,6 +34,7 @@ export const midl_transfer_evm = tool({
       amount: displayAmount,
       amountWei,
       explorerUrl: config.explorerUrl,
+      mempoolUrl: config.mempoolUrl,
     };
 
     console.log('[transfer-evm] Returning transaction:', transaction);

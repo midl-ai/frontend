@@ -30,6 +30,7 @@ export const midl_transfer_token = tool({
       decimals,
       symbol,
       explorerUrl: `${config.explorerUrl}/token/${tokenAddress}`,
+      mempoolUrl: config.mempoolUrl,
     };
 
     console.log('[transfer-token] Returning transaction:', transaction);

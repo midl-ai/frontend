@@ -19,7 +19,8 @@ export const midl_bridge_rune_to_erc20 = tool({
       runeId,
       runeName,
       amount,
-      explorerUrl: config.mempoolUrl,
+      explorerUrl: config.explorerUrl,
+      mempoolUrl: config.mempoolUrl,
     };
 
     console.log('[bridge-rune-to-erc20] Returning transaction:', transaction);

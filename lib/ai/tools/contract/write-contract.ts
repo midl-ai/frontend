@@ -30,6 +30,7 @@ export const midl_write_contract = tool({
       args,
       value,
       explorerUrl: `${config.explorerUrl}/address/${address}`,
+      mempoolUrl: config.mempoolUrl,
     };
 
     console.log('[write-contract] Returning transaction:', transaction);

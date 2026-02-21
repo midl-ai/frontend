@@ -24,6 +24,7 @@ export const midl_bridge_erc20_to_rune = tool({
       amount,
       btcAddress,
       explorerUrl: config.explorerUrl,
+      mempoolUrl: config.mempoolUrl,
     };
 
     console.log('[bridge-erc20-to-rune] Returning transaction:', transaction);

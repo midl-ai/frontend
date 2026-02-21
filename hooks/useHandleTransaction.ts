@@ -56,7 +56,7 @@ export function useHandleTransaction() {
    * 3. Broadcast
    */
   const executeMidlFlow = useCallback(async (
-    explorerUrl: string
+    mempoolUrl: string
   ): Promise<TransactionResult> => {
     // Note: We don't check txIntentions.length here because React state
     // lags behind the SDK's internal store. The intention was just added
@@ -103,7 +103,7 @@ export function useHandleTransaction() {
 
     return {
       btcTxId,
-      explorerUrl: `${explorerUrl}/tx/${btcTxId}`,
+      explorerUrl: `${mempoolUrl}/tx/${btcTxId}`,
     };
   }, [finalizeBTCTransactionAsync, signIntentionsAsync, sendBTCTransactionsAsync, clearTxIntentions]);
 
@@ -147,7 +147,7 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlFlow(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.mempoolUrl);
           break;
         }
 
@@ -169,7 +169,7 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlFlow(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.mempoolUrl);
           break;
         }
 
@@ -191,7 +191,7 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlFlow(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.mempoolUrl);
           break;
         }
 
@@ -201,7 +201,7 @@ export function useHandleTransaction() {
           await addCompleteTxIntentionAsync({
             satoshis: Number(transaction.satoshis),
           });
-          txResult = await executeMidlFlow(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.mempoolUrl);
           break;
         }
 
@@ -224,7 +224,7 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlFlow(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.mempoolUrl);
           break;
         }
 
@@ -242,7 +242,7 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlFlow(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.mempoolUrl);
           break;
         }
 
@@ -284,7 +284,7 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlFlow(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.mempoolUrl);
           break;
         }
 
@@ -297,7 +297,7 @@ export function useHandleTransaction() {
               address: transaction.erc20Address as `0x${string}`,
             }],
           });
-          txResult = await executeMidlFlow(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.mempoolUrl);
           break;
         }
 

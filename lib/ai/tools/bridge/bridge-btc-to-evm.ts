@@ -30,7 +30,8 @@ export const midl_bridge_btc_to_evm = tool({
       type: 'bridge_deposit',
       satoshis: satoshis.toString(),
       btcAmount,
-      explorerUrl: config.mempoolUrl,
+      explorerUrl: config.explorerUrl,
+      mempoolUrl: config.mempoolUrl,
     };
 
     console.log('[bridge-btc-to-evm] Returning transaction:', transaction);
