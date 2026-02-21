@@ -1,7 +1,6 @@
 import {
   streamText,
   convertToModelMessages,
-  createUIMessageStream,
   stepCountIs,
   type UIMessage,
 } from 'ai';
@@ -14,7 +13,8 @@ import {
   getChatById,
   updateChatTitle,
   getOrCreateUserByAddress,
-  getMessagesByChatId,
+  deleteChat,
+  deleteMessagesByChatId,
 } from '@/lib/db/queries';
 import { generateUUID } from '@/lib/utils';
 
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     let userId: string | undefined;
     let existingChat: Awaited<ReturnType<typeof getChatById>> | null = null;
 
-    if (walletAddress) {
+    if (walletAddress && walletAddress !== '0x0000000000000000000000000000000000000000') {
       const user = await getOrCreateUserByAddress(walletAddress);
       userId = user.id;
 
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
         });
       }
 
-      // Save user message
+      // Save user message immediately
       const userMessage = messages[messages.length - 1];
       if (userMessage?.role === 'user') {
         await saveMessages({
@@ -89,38 +89,55 @@ export async function POST(request: Request) {
     // Convert UI messages to model messages
     const modelMessages = await convertToModelMessages(messages);
 
-    // Create UI message stream that properly formats tool results for persistence
-    const stream = createUIMessageStream({
-      execute: ({ writer }) => {
-        const result = streamText({
-          model: getModelProvider()(getDefaultModel()),
-          system: systemPrompt,
-          messages: modelMessages,
-          tools,
-          stopWhen: stepCountIs(10),
-        });
-
-        result.consumeStream();
-        writer.merge(result.toUIMessageStream());
-      },
-      generateId: generateUUID,
-      onFinish: async ({ messages: uiMessages }) => {
+    // Create streaming response with tools
+    const result = streamText({
+      model: getModelProvider()(getDefaultModel()),
+      system: systemPrompt,
+      messages: modelMessages,
+      tools,
+      stopWhen: stepCountIs(10),
+      onFinish: async ({ response }) => {
         if (!userId) return;
 
-        // Filter to get only assistant messages from this response
-        const assistantMessages = uiMessages.filter(
+        // Save assistant messages to database
+        const assistantMessages = response.messages.filter(
           (m) => m.role === 'assistant'
         );
 
         if (assistantMessages.length > 0) {
-          // Save messages with properly formatted parts (including state: 'output-available')
+          // Convert model messages to UI format for storage
+          const messagesToSave = assistantMessages.map((m) => {
+            // Convert content array to parts format
+            const parts = Array.isArray(m.content)
+              ? m.content.map((c) => {
+                  if (c.type === 'text') {
+                    return { type: 'text' as const, text: c.text };
+                  }
+                  if (c.type === 'tool-call') {
+                    // Store tool calls with output-available state for proper rendering
+                    return {
+                      type: `tool-${c.toolName}` as const,
+                      toolCallId: c.toolCallId,
+                      toolName: c.toolName,
+                      state: 'output-available' as const,
+                      input: (c as { input?: unknown }).input || {},
+                      output: null, // Will be populated by tool-result
+                    };
+                  }
+                  return c;
+                })
+              : [{ type: 'text' as const, text: String(m.content) }];
+
+            return {
+              id: generateUUID(),
+              role: m.role,
+              parts,
+            };
+          });
+
           await saveMessages({
             chatId,
-            messages: assistantMessages.map((m) => ({
-              id: m.id,
-              role: m.role,
-              parts: m.parts,
-            })),
+            messages: messagesToSave,
           });
 
           // Update chat title if this is the first response
@@ -135,17 +152,44 @@ export async function POST(request: Request) {
           }
         }
       },
-      onError: (error) => {
-        console.error('[Chat API] Stream error:', error);
-        return 'An error occurred while processing your request.';
-      },
     });
 
-    return new Response(stream);
+    // Return UI message stream response
+    return result.toUIMessageStreamResponse();
   } catch (error) {
     console.error('[Chat API] Error:', error);
     return new Response(
       JSON.stringify({ error: 'Failed to process chat request' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const chatId = searchParams.get('id');
+
+    if (!chatId) {
+      return new Response(
+        JSON.stringify({ error: 'Chat ID is required' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Delete messages first (foreign key constraint)
+    await deleteMessagesByChatId(chatId);
+    // Then delete the chat
+    await deleteChat(chatId);
+
+    return new Response(
+      JSON.stringify({ success: true }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('[Chat API] Delete error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Failed to delete chat' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
