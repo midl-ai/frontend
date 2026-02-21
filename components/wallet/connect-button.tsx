@@ -149,7 +149,7 @@ export function ConnectButton() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Real MIDL SDK hooks - request both Payment and Ordinals addresses
+  // Real MIDL SDK hooks
   const { connect, connectors, isPending: isConnecting } = useConnect({
     purposes: [AddressPurpose.Payment, AddressPurpose.Ordinals],
   });
@@ -157,19 +157,36 @@ export function ConnectButton() {
   const account = useDefaultAccount();
   const evmAddress = useEVMAddress();
 
+  // Derive connection state from account
   const isConnected = !!account;
   const btcAddress = account?.address;
+  const displayAddress = evmAddress || btcAddress;
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[Wallet] State:', { isConnected, account, evmAddress, btcAddress });
+  }, [isConnected, account, evmAddress, btcAddress]);
 
   // Persist addresses to localStorage for API calls
   useEffect(() => {
-    if (isConnected && evmAddress) {
-      localStorage.setItem('walletAddress', evmAddress);
-      if (evmAddress) localStorage.setItem('evmAddress', evmAddress);
-      if (btcAddress) localStorage.setItem('btcAddress', btcAddress);
-    } else if (!isConnected) {
+    if (isConnected) {
+      // Use BTC address as primary identifier if EVM not yet available
+      const primaryAddress = evmAddress || btcAddress;
+      if (primaryAddress) {
+        localStorage.setItem('walletAddress', primaryAddress);
+      }
+      if (evmAddress) {
+        localStorage.setItem('evmAddress', evmAddress);
+      }
+      if (btcAddress) {
+        localStorage.setItem('btcAddress', btcAddress);
+      }
+      console.log('[Wallet] Saved to localStorage:', { primaryAddress, evmAddress, btcAddress });
+    } else {
       localStorage.removeItem('walletAddress');
       localStorage.removeItem('evmAddress');
       localStorage.removeItem('btcAddress');
+      console.log('[Wallet] Cleared localStorage');
     }
   }, [isConnected, evmAddress, btcAddress]);
 
@@ -184,14 +201,18 @@ export function ConnectButton() {
 
     // Use Xverse connector (first in the list)
     const xverseConnector = connectors[0];
+    console.log('[Wallet] Connecting with:', xverseConnector);
+
     if (xverseConnector) {
       try {
         await connect({ id: xverseConnector.id });
+        console.log('[Wallet] Connection successful');
       } catch (err) {
-        console.error('Wallet connection error:', err);
+        console.error('[Wallet] Connection error:', err);
         setError(err instanceof Error ? err.message : 'Failed to connect wallet');
       }
     } else {
+      console.error('[Wallet] No connectors available:', connectors);
       setError('No wallet connector available');
     }
   }, [connect, connectors]);
@@ -201,7 +222,8 @@ export function ConnectButton() {
     setIsDropdownOpen(false);
   }, [disconnect]);
 
-  if (isConnected && btcAddress) {
+  // Show connected state if we have an account (even without EVM address yet)
+  if (isConnected && displayAddress) {
     return (
       <div className="relative">
         <button
@@ -215,7 +237,7 @@ export function ConnectButton() {
         >
           <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
           <span className="font-mono text-sm">
-            {truncateAddress(evmAddress || btcAddress, 4)}
+            {truncateAddress(displayAddress, 4)}
           </span>
           <ChevronDown
             className={cn(
