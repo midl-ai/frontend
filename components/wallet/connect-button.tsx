@@ -155,7 +155,12 @@ export function ConnectButton() {
   });
   const { disconnect } = useDisconnect();
   const { paymentAccount, isConnected, isConnecting } = useAccounts();
-  const evmAddress = useEVMAddress();
+  const rawEvmAddress = useEVMAddress();
+
+  // Filter out zero address (returned when not connected)
+  const evmAddress = rawEvmAddress && rawEvmAddress !== '0x0000000000000000000000000000000000000000'
+    ? rawEvmAddress
+    : undefined;
 
   // Use payment account's BTC address as primary identifier
   const btcAddress = paymentAccount?.address;
@@ -163,8 +168,8 @@ export function ConnectButton() {
 
   // Debug logging
   useEffect(() => {
-    console.log('[Wallet] State:', { isConnected, paymentAccount, evmAddress, btcAddress });
-  }, [isConnected, paymentAccount, evmAddress, btcAddress]);
+    console.log('[Wallet] State:', { isConnected, paymentAccount, evmAddress, btcAddress, rawEvmAddress });
+  }, [isConnected, paymentAccount, evmAddress, btcAddress, rawEvmAddress]);
 
   // Persist addresses to localStorage for API calls
   useEffect(() => {

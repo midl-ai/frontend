@@ -183,10 +183,15 @@ export function Sidebar() {
 
   // Get wallet state directly from MIDL hooks - useAccounts is reactive
   const { paymentAccount, isConnected } = useAccounts();
-  const evmAddress = useEVMAddress();
+  const rawEvmAddress = useEVMAddress();
 
-  // Use payment account's BTC address as primary identifier
-  const walletAddress = evmAddress || paymentAccount?.address;
+  // Filter out zero address (returned when not connected)
+  const evmAddress = rawEvmAddress && rawEvmAddress !== '0x0000000000000000000000000000000000000000'
+    ? rawEvmAddress
+    : undefined;
+
+  // Use payment account's BTC address as primary identifier - only when connected
+  const walletAddress = isConnected ? (evmAddress || paymentAccount?.address) : undefined;
 
   // Debug logging
   useEffect(() => {
