@@ -93,6 +93,27 @@ export function TransactionWrapper({
             </a>
           )}
         </div>
+
+        {/* Show contract address for deployments */}
+        {result.contractAddress && (
+          <div className="p-3 bg-zinc-800/50 border border-zinc-700 rounded-lg">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs text-zinc-400">Contract Address</p>
+              {result.evmExplorerUrl && (
+                <a
+                  href={result.evmExplorerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-accent hover:text-accent/80 flex items-center gap-1"
+                >
+                  View on Explorer <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+            <p className="text-sm font-mono text-white break-all">{result.contractAddress}</p>
+          </div>
+        )}
+
         <button
           onClick={handleReset}
           className="w-full py-2 text-sm text-zinc-400 hover:text-white transition-colors"

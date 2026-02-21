@@ -11,7 +11,8 @@ import {
   useClearTxIntentions,
   useEVMAddress,
 } from '@midl/executor-react';
-import { encodeFunctionData, parseAbi, zeroAddress } from 'viem';
+import { encodeFunctionData, parseAbi, zeroAddress, getContractAddress } from 'viem';
+import { getPublicClient } from '@/lib/midl/client';
 import type { PreparedTransaction } from '@/lib/ai/tools/types';
 
 export type TransactionState = 'idle' | 'preparing' | 'signing' | 'broadcasting' | 'success' | 'error';
@@ -20,7 +21,10 @@ export interface TransactionResult {
   txHash?: string;
   btcTxId?: string;
   contractAddress?: string;
+  /** BTC explorer URL (Mempool) for transaction */
   explorerUrl?: string;
+  /** EVM explorer URL (Blockscout) for contract address */
+  evmExplorerUrl?: string;
   error?: string;
 }
 
@@ -33,7 +37,7 @@ export function useHandleTransaction() {
   const evmAddress = useEVMAddress();
 
   // MIDL SDK hooks
-  const { addTxIntentionAsync, txIntentions } = useAddTxIntention();
+  const { addTxIntentionAsync } = useAddTxIntention();
   const { signIntentionsAsync } = useSignIntentions();
   const { finalizeBTCTransactionAsync } = useFinalizeBTCTransaction();
   const { sendBTCTransactionsAsync } = useSendBTCTransactions();
@@ -234,6 +238,14 @@ export function useHandleTransaction() {
             throw new Error('Bytecode required for contract deployment');
           }
 
+          // Get nonce BEFORE deployment to compute contract address
+          // Contract address is deterministic: keccak256(rlp([sender, nonce]))
+          const publicClient = getPublicClient();
+          const nonce = await publicClient.getTransactionCount({
+            address: evmAddress as `0x${string}`,
+          });
+          console.log('[useHandleTransaction] Current nonce for deployment:', nonce);
+
           await addTxIntentionAsync({
             intention: {
               evmTransaction: {
@@ -242,7 +254,22 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlFlow(transaction.mempoolUrl);
+
+          const flowResult = await executeMidlFlow(transaction.mempoolUrl);
+
+          // Compute contract address from deployer + nonce
+          const contractAddress = getContractAddress({
+            from: evmAddress as `0x${string}`,
+            nonce: BigInt(nonce),
+          });
+          console.log('[useHandleTransaction] Computed contract address:', contractAddress);
+
+          txResult = {
+            ...flowResult,
+            contractAddress,
+            // EVM explorer (Blockscout) for contract address
+            evmExplorerUrl: `${transaction.explorerUrl}/address/${contractAddress}`,
+          };
           break;
         }
 
