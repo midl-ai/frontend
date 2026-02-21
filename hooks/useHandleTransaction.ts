@@ -58,11 +58,10 @@ export function useHandleTransaction() {
   const executeMidlFlow = useCallback(async (
     explorerUrl: string
   ): Promise<TransactionResult> => {
-    console.log('[useHandleTransaction] Starting MIDL flow, intentions:', txIntentions);
-
-    if (txIntentions.length === 0) {
-      throw new Error('No transaction intentions to process');
-    }
+    // Note: We don't check txIntentions.length here because React state
+    // lags behind the SDK's internal store. The intention was just added
+    // via addTxIntentionAsync but txIntentions hasn't updated yet.
+    console.log('[useHandleTransaction] Starting MIDL flow...');
 
     setState('preparing');
 
@@ -106,7 +105,7 @@ export function useHandleTransaction() {
       btcTxId,
       explorerUrl: `${explorerUrl}/tx/${btcTxId}`,
     };
-  }, [txIntentions, finalizeBTCTransactionAsync, signIntentionsAsync, sendBTCTransactionsAsync, clearTxIntentions]);
+  }, [finalizeBTCTransactionAsync, signIntentionsAsync, sendBTCTransactionsAsync, clearTxIntentions]);
 
   /**
    * Execute transaction based on prepared data
