@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, memo, useEffect } from 'react';
+import { useState, useCallback, memo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
@@ -45,6 +45,7 @@ const WalletDropdown = memo(function WalletDropdown({
   onClose,
 }: WalletDropdownProps) {
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const copyAddress = useCallback((e: React.MouseEvent, address: string, type: string) => {
     e.preventDefault();
@@ -54,38 +55,38 @@ const WalletDropdown = memo(function WalletDropdown({
     setTimeout(() => setCopiedAddress(null), 2000);
   }, []);
 
-  // Handle click outside to close
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onClose();
-  }, [onClose]);
+  // Close on click outside using document listener
+  useEffect(() => {
+    if (!isOpen) return;
 
-  // Prevent dropdown clicks from closing
-  const handleDropdownClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    // Delay to prevent immediate close from the same click that opened it
+    const timer = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Backdrop - transparent but clickable */}
-      <div
-        className="fixed inset-0 z-[60]"
-        onClick={handleBackdropClick}
-        style={{ cursor: 'default' }}
-      />
-
-      {/* Dropdown */}
-      <motion.div
-        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-        transition={{ duration: 0.15 }}
-        className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-border bg-card shadow-lg z-[70] overflow-hidden"
-        onClick={handleDropdownClick}
-      >
+    <motion.div
+      ref={dropdownRef}
+      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+      transition={{ duration: 0.15 }}
+      className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-border bg-card shadow-lg z-[70] overflow-hidden"
+    >
         {/* Header */}
         <div className="px-4 py-3 border-b border-border bg-background-tertiary/50">
           <p className="text-xs text-foreground-muted uppercase tracking-wider font-medium">
@@ -162,7 +163,6 @@ const WalletDropdown = memo(function WalletDropdown({
           </button>
         </div>
       </motion.div>
-    </>
   );
 });
 

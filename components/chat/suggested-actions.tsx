@@ -248,7 +248,7 @@ interface CategoryTabProps {
   onCategoryClick: (id: string) => void;
 }
 
-const CategoryTab = memo(function CategoryTab({
+function CategoryTab({
   category,
   isActive,
   onCategoryClick,
@@ -256,13 +256,10 @@ const CategoryTab = memo(function CategoryTab({
   const Icon = category.icon;
   const colors = colorClasses[category.color as keyof typeof colorClasses];
 
-  const handleClick = useCallback(() => {
-    onCategoryClick(category.id);
-  }, [onCategoryClick, category.id]);
-
   return (
     <button
-      onClick={handleClick}
+      type="button"
+      onClick={() => onCategoryClick(category.id)}
       data-active={isActive}
       className={cn(
         'flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-medium whitespace-nowrap transition-all',
@@ -277,7 +274,7 @@ const CategoryTab = memo(function CategoryTab({
       </span>
     </button>
   );
-});
+}
 
 /** Suggested actions grid with category tabs */
 export function SuggestedActions({ onSelect }: SuggestedActionsProps) {
