@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation';
 import {
   MessageSquare,
   Plus,
-  PanelLeftClose,
-  PanelLeftOpen,
+  ChevronLeft,
+  ChevronRight,
   Trash2,
   Loader2,
   Wallet,
@@ -111,19 +111,12 @@ const ChatItem = memo(function ChatItem({ chat, isActive, onDelete }: ChatItemPr
       className={cn(
         'group flex items-center gap-3 px-3 py-2.5 text-sm rounded-xl transition-all duration-200',
         isActive
-          ? 'bg-gradient-to-r from-accent/15 to-accent/5 text-accent border border-accent/20 shadow-sm'
+          ? 'bg-accent/15 text-accent border border-accent/20'
           : 'text-foreground-muted hover:bg-white/5 hover:text-foreground'
       )}
     >
-      <div
-        className={cn(
-          'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors',
-          isActive ? 'bg-accent/20' : 'bg-white/5 group-hover:bg-white/10'
-        )}
-      >
-        <MessageSquare className="w-4 h-4" />
-      </div>
-      <span className="truncate flex-1 font-medium">{chat.title || 'New conversation'}</span>
+      <MessageSquare className="w-4 h-4 shrink-0" />
+      <span className="truncate flex-1">{chat.title || 'New conversation'}</span>
 
       <AnimatePresence>
         {showDelete && !isDeleting && (
@@ -132,7 +125,7 @@ const ChatItem = memo(function ChatItem({ chat, isActive, onDelete }: ChatItemPr
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={handleDelete}
-            className="p-1.5 rounded-lg hover:bg-error/10 text-foreground-muted hover:text-error transition-colors"
+            className="p-1 rounded-lg hover:bg-error/10 text-foreground-muted hover:text-error transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </motion.button>
@@ -161,11 +154,7 @@ const ChatGroup = memo(function ChatGroup({
   if (chats.length === 0) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-1.5"
-    >
+    <div className="space-y-1">
       <div className="flex items-center gap-2 px-3 mb-2">
         <span className="text-foreground-subtle">{icon}</span>
         <h3 className="text-xs font-semibold text-foreground-subtle uppercase tracking-wider">
@@ -173,21 +162,15 @@ const ChatGroup = memo(function ChatGroup({
         </h3>
         <span className="text-xs text-foreground-subtle/50 ml-auto">{chats.length}</span>
       </div>
-      {chats.map((chat, i) => (
-        <motion.div
+      {chats.map((chat) => (
+        <ChatItem
           key={chat.id}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.03 }}
-        >
-          <ChatItem
-            chat={chat}
-            isActive={currentPath === `/chat/${chat.id}`}
-            onDelete={onDelete}
-          />
-        </motion.div>
+          chat={chat}
+          isActive={currentPath === `/chat/${chat.id}`}
+          onDelete={onDelete}
+        />
       ))}
-    </motion.div>
+    </div>
   );
 });
 
@@ -199,6 +182,8 @@ const groupIcons: Record<string, React.ReactNode> = {
   'This Month': <Clock className="w-3.5 h-3.5" />,
   Earlier: <Clock className="w-3.5 h-3.5" />,
 };
+
+const SIDEBAR_WIDTH = 280;
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -231,120 +216,122 @@ export function Sidebar() {
   const groupedChats = data?.chats ? groupChatsByDate(data.chats) : null;
 
   return (
-    <>
-      {/* Mobile Toggle */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-xl bg-background/80 backdrop-blur-sm border border-border shadow-lg"
-        aria-label="Toggle sidebar"
-      >
-        {isOpen ? (
-          <PanelLeftClose className="w-5 h-5" />
-        ) : (
-          <PanelLeftOpen className="w-5 h-5" />
-        )}
-      </button>
-
-      {/* Sidebar */}
+    <div className="relative h-full flex">
+      {/* Sidebar Panel */}
       <motion.aside
-        initial={{ width: 300 }}
-        animate={{ width: isOpen ? 300 : 0 }}
+        initial={false}
+        animate={{ width: isOpen ? SIDEBAR_WIDTH : 0 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        className={cn(
-          'fixed md:relative z-40 h-screen bg-sidebar overflow-hidden flex flex-col',
-          'border-r border-sidebar-border/50',
-          !isOpen && 'border-none'
-        )}
+        className="h-full overflow-hidden"
       >
-        {/* New Session Button - Main CTA */}
-        <div className="p-4">
-          <Link
-            href="/chat"
-            className={cn(
-              'flex items-center justify-center gap-2.5 w-full px-4 py-3 rounded-xl',
-              'bg-gradient-to-r from-accent to-accent/80 text-accent-foreground',
-              'font-semibold hover:shadow-lg hover:shadow-accent/20 transition-all duration-300',
-              'group border border-accent/20'
-            )}
-          >
-            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-            <span>New Session</span>
-          </Link>
-        </div>
-
-        {/* History Section */}
-        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6 scrollbar-thin scrollbar-thumb-border/50">
-          {!hasWallet ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="px-3 py-12 text-center"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/10 to-accent/5 flex items-center justify-center mx-auto mb-4 border border-accent/10">
-                <Wallet className="w-8 h-8 text-accent/60" />
-              </div>
-              <p className="text-sm font-medium text-foreground mb-1">Connect your wallet</p>
-              <p className="text-xs text-foreground-subtle">to view your chat history</p>
-            </motion.div>
-          ) : isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12 gap-3">
-              <Loader2 className="w-6 h-6 animate-spin text-accent" />
-              <span className="text-xs text-foreground-subtle">Loading history...</span>
-            </div>
-          ) : groupedChats && Object.values(groupedChats).some((g) => g.length > 0) ? (
-            <>
-              {Object.entries(groupedChats).map(([title, chats]) => (
-                <ChatGroup
-                  key={title}
-                  title={title}
-                  chats={chats}
-                  currentPath={pathname}
-                  onDelete={handleDelete}
-                  icon={groupIcons[title]}
-                />
-              ))}
-            </>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="px-3 py-12 text-center"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] flex items-center justify-center mx-auto mb-4 border border-white/5">
-                <MessageSquare className="w-8 h-8 text-foreground-subtle" />
-              </div>
-              <p className="text-sm font-medium text-foreground mb-1">No conversations yet</p>
-              <p className="text-xs text-foreground-subtle">Start a session to begin</p>
-            </motion.div>
+        <div
+          className={cn(
+            'h-full flex flex-col',
+            'bg-sidebar/95 backdrop-blur-xl',
+            'border-r border-sidebar-border/30',
+            // Chip/trapezoid shape with rounded corners
+            'm-3 mr-0 rounded-2xl',
+            'shadow-xl shadow-black/10'
           )}
-        </div>
+          style={{ width: SIDEBAR_WIDTH - 24 }}
+        >
+          {/* New Session Button */}
+          <div className="p-4">
+            <Link
+              href="/chat"
+              className={cn(
+                'flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl',
+                'bg-accent text-accent-foreground font-semibold',
+                'hover:bg-accent-hover transition-all duration-200',
+                'shadow-lg shadow-accent/20 group'
+              )}
+            >
+              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+              <span>New Session</span>
+            </Link>
+          </div>
 
-        {/* Footer - Minimal Status */}
-        <div className="p-4 border-t border-sidebar-border/50">
-          <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.02]">
-            <div className="relative">
-              <div className="w-2 h-2 rounded-full bg-success" />
-              <div className="absolute inset-0 w-2 h-2 rounded-full bg-success animate-ping opacity-75" />
+          {/* History Section */}
+          <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
+            {!hasWallet ? (
+              <div className="px-3 py-8 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-3 border border-accent/10">
+                  <Wallet className="w-7 h-7 text-accent/60" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">Connect wallet</p>
+                <p className="text-xs text-foreground-subtle">to view history</p>
+              </div>
+            ) : isLoading ? (
+              <div className="flex flex-col items-center justify-center py-8 gap-2">
+                <Loader2 className="w-5 h-5 animate-spin text-accent" />
+                <span className="text-xs text-foreground-subtle">Loading...</span>
+              </div>
+            ) : groupedChats && Object.values(groupedChats).some((g) => g.length > 0) ? (
+              <>
+                {Object.entries(groupedChats).map(([title, chats]) => (
+                  <ChatGroup
+                    key={title}
+                    title={title}
+                    chats={chats}
+                    currentPath={pathname}
+                    onDelete={handleDelete}
+                    icon={groupIcons[title]}
+                  />
+                ))}
+              </>
+            ) : (
+              <div className="px-3 py-8 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-3 border border-white/5">
+                  <MessageSquare className="w-7 h-7 text-foreground-subtle" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">No conversations</p>
+                <p className="text-xs text-foreground-subtle">Start a session</p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer Status */}
+          <div className="p-3 border-t border-sidebar-border/30">
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.03]">
+              <div className="relative">
+                <div className="w-2 h-2 rounded-full bg-success" />
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-success animate-ping opacity-50" />
+              </div>
+              <span className="text-xs text-foreground-muted">MIDL Network</span>
+              <span className="text-xs text-success ml-auto">Live</span>
             </div>
-            <span className="text-xs text-foreground-muted font-medium">MIDL Network</span>
-            <span className="text-xs text-success ml-auto">Connected</span>
           </div>
         </div>
       </motion.aside>
 
-      {/* Mobile Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 md:hidden"
-            onClick={() => setIsOpen(false)}
-          />
+      {/* Edge Toggle Button - Always visible */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          'absolute top-1/2 -translate-y-1/2 z-50',
+          'w-6 h-16 flex items-center justify-center',
+          'bg-sidebar/90 backdrop-blur-sm',
+          'border border-sidebar-border/50',
+          'hover:bg-sidebar-hover transition-all duration-200',
+          'shadow-lg shadow-black/10',
+          // Position at sidebar edge
+          isOpen ? 'rounded-r-xl' : 'rounded-xl',
+          'hover:w-8'
         )}
-      </AnimatePresence>
-    </>
+        style={{
+          left: isOpen ? SIDEBAR_WIDTH - 12 : 0,
+          transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+        aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
+      >
+        <motion.div
+          animate={{ rotate: isOpen ? 0 : 180 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronLeft className="w-4 h-4 text-foreground-muted" />
+        </motion.div>
+      </button>
+    </div>
   );
 }
 

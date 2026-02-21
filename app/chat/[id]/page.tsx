@@ -1,5 +1,5 @@
 import { Chat } from '@/components/chat/chat';
-import { getMessagesByChatId } from '@/lib/db/queries';
+import { getMessagesByChatId, isDatabaseAvailable } from '@/lib/db/queries';
 import type { UIMessage } from '@ai-sdk/react';
 
 interface ChatPageProps {
@@ -9,28 +9,34 @@ interface ChatPageProps {
 export default async function ExistingChatPage({ params }: ChatPageProps) {
   const { id } = await params;
 
-  // Fetch existing messages
-  const messages = await getMessagesByChatId(id);
+  // Skip database fetch if not available
+  let initialMessages: UIMessage[] = [];
 
-  // Convert DB messages to UIMessage format
-  const initialMessages: UIMessage[] = messages.map((m) => {
-    // Parse stored parts - they could be string or already parsed
-    let parts: unknown[];
+  if (isDatabaseAvailable()) {
     try {
-      const parsed = typeof m.parts === 'string' ? JSON.parse(m.parts) : m.parts;
-      // Ensure parts is an array
-      parts = Array.isArray(parsed) ? parsed : [{ type: 'text', text: String(parsed) }];
-    } catch {
-      // If parsing fails, treat as plain text
-      parts = [{ type: 'text', text: String(m.parts) }];
-    }
+      const messages = await getMessagesByChatId(id);
 
-    return {
-      id: m.id,
-      role: m.role as 'user' | 'assistant',
-      parts,
-    } as UIMessage;
-  });
+      // Convert DB messages to UIMessage format
+      initialMessages = messages.map((m) => {
+        let parts: unknown[];
+        try {
+          const parsed = typeof m.parts === 'string' ? JSON.parse(m.parts) : m.parts;
+          parts = Array.isArray(parsed) ? parsed : [{ type: 'text', text: String(parsed) }];
+        } catch {
+          parts = [{ type: 'text', text: String(m.parts) }];
+        }
+
+        return {
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          parts,
+        } as UIMessage;
+      });
+    } catch {
+      // Database error - start with empty messages
+      initialMessages = [];
+    }
+  }
 
   return <Chat id={id} initialMessages={initialMessages} />;
 }
