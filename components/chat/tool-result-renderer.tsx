@@ -31,7 +31,6 @@ import {
   ERC20ToRuneCard,
   // Contract
   ContractReadCard,
-  ContractWriteCard,
   ContractLogsCard,
   VerifyContractCard,
   DeploymentCard,
@@ -139,8 +138,6 @@ export function ToolResultRenderer({ toolName, result }: ToolResultRendererProps
     // Contract tools
     case 'midl_read_contract':
       return <ContractReadCard data={data as ToolResponse<never>} />;
-    case 'midl_write_contract':
-      return <ContractWriteCard data={data as ToolResponse<never>} />;
     case 'midl_get_logs':
       return <ContractLogsCard data={data as ToolResponse<never>} />;
     case 'midl_verify_contract':

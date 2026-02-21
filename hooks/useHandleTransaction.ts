@@ -209,29 +209,6 @@ export function useHandleTransaction() {
           break;
         }
 
-        case 'contract_write': {
-          console.log('[useHandleTransaction] Adding contract write intention...');
-          const parsedAbi = JSON.parse(transaction.abi);
-          const data = encodeFunctionData({
-            abi: parsedAbi,
-            functionName: transaction.functionName,
-            args: transaction.args || [],
-          });
-
-          await addTxIntentionAsync({
-            intention: {
-              evmTransaction: {
-                to: transaction.contractAddress as `0x${string}`,
-                value: transaction.value ? BigInt(transaction.value) : BigInt(0),
-                data,
-              },
-            },
-            reset: true,
-          });
-          txResult = await executeMidlFlow(transaction.mempoolUrl);
-          break;
-        }
-
         case 'contract_deploy': {
           console.log('[useHandleTransaction] Adding contract deploy intention...');
           if (!transaction.bytecode) {

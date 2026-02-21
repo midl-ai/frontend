@@ -320,16 +320,6 @@ export interface BridgeWithdrawTransaction extends BaseTransaction {
   btcAddress: string;
 }
 
-/** Contract write transaction */
-export interface ContractWriteTransaction extends BaseTransaction {
-  type: 'contract_write';
-  contractAddress: string;
-  abi: string;
-  functionName: string;
-  args?: string[];
-  value?: string;
-}
-
 /** Contract deploy transaction */
 export interface ContractDeployTransaction extends BaseTransaction {
   type: 'contract_deploy';
@@ -371,7 +361,6 @@ export type PreparedTransaction =
   | TokenTransferTransaction
   | BridgeDepositTransaction
   | BridgeWithdrawTransaction
-  | ContractWriteTransaction
   | ContractDeployTransaction
   | RuneTransferTransaction
   | RuneToERC20Transaction

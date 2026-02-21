@@ -1,6 +1,6 @@
 /**
  * MIDL Tool Card Components
- * 29 card components for displaying tool results
+ * 28 card components for displaying tool results
  */
 
 // Base components
@@ -41,7 +41,6 @@ export { ERC20ToRuneCard } from './ERC20ToRuneCard';
 
 // Contract cards
 export { ContractReadCard } from './ContractReadCard';
-export { ContractWriteCard } from './ContractWriteCard';
 export { ContractLogsCard } from './ContractLogsCard';
 export { VerifyContractCard } from './VerifyContractCard';
 export { DeploymentCard } from './DeploymentCard';

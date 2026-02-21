@@ -1,5 +1,5 @@
 /**
- * MIDL AI Tools - Export all 29 tools for AI SDK v6
+ * MIDL AI Tools - Export all 28 tools for AI SDK v6
  * Tools are grouped by category for organization
  */
 
@@ -21,9 +21,8 @@ import { midl_get_transaction } from './bitcoin/get-transaction';
 import { midl_get_transaction_receipt } from './bitcoin/get-transaction-receipt';
 import { midl_get_fee_rate } from './bitcoin/get-fee-rate';
 
-// Contract tools (4)
+// Contract tools (3)
 import { midl_read_contract } from './contract/read-contract';
-import { midl_write_contract } from './contract/write-contract';
 import { midl_get_logs } from './contract/get-logs';
 import { midl_verify_contract } from './contract/verify-contract';
 
@@ -69,7 +68,6 @@ export {
   midl_get_fee_rate,
   // Contract
   midl_read_contract,
-  midl_write_contract,
   midl_get_logs,
   midl_verify_contract,
   // Transfer
@@ -109,9 +107,8 @@ export const midlTools = {
   midl_get_transaction,
   midl_get_transaction_receipt,
   midl_get_fee_rate,
-  // Contract (4)
+  // Contract (3)
   midl_read_contract,
-  midl_write_contract,
   midl_get_logs,
   midl_verify_contract,
   // Transfer (3)
@@ -142,4 +139,4 @@ export function getMidlTools(): ToolSet {
 }
 
 /** Tool count for reference */
-export const TOOL_COUNT = 29;
+export const TOOL_COUNT = 28;
