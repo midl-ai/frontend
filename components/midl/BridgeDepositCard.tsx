@@ -1,14 +1,31 @@
 'use client';
 
 import { ArrowDownToLine } from 'lucide-react';
-import { BaseCard, ErrorCard, DataRow } from './base';
+import { BaseCard, ErrorCard, DataRow, WalletRequiredCard } from './base';
 import type { ToolResponse, BridgeBtcToEvmInfo } from '@/lib/ai/tools/types';
 
+// Extended type to handle requiresWallet case
+interface BridgeDepositData extends BridgeBtcToEvmInfo {
+  requiresWallet?: boolean;
+  amount?: string;
+}
+
 interface BridgeDepositCardProps {
-  data: ToolResponse<BridgeBtcToEvmInfo>;
+  data: ToolResponse<BridgeDepositData>;
 }
 
 export function BridgeDepositCard({ data }: BridgeDepositCardProps) {
+  // Handle requiresWallet case
+  if (!data.success && data.data?.requiresWallet) {
+    const { amount } = data.data;
+    return (
+      <WalletRequiredCard
+        title="Bridge Deposit Pending"
+        details={amount ? [{ label: 'Amount', value: `${amount} BTC` }] : undefined}
+      />
+    );
+  }
+
   if (!data.success || !data.data) {
     return <ErrorCard error={data.error || 'Bridge deposit failed'} toolName="Bridge Deposit" />;
   }

@@ -1,14 +1,35 @@
 'use client';
 
 import { Coins, ExternalLink } from 'lucide-react';
-import { BaseCard, ErrorCard, DataRow, AddressDisplay } from './base';
+import { BaseCard, ErrorCard, DataRow, AddressDisplay, WalletRequiredCard } from './base';
 import type { ToolResponse, TransferInfo } from '@/lib/ai/tools/types';
 
+// Extended type to handle requiresWallet case
+interface TokenTransferData extends TransferInfo {
+  requiresWallet?: boolean;
+  tokenAddress?: string;
+}
+
 interface TokenTransferCardProps {
-  data: ToolResponse<TransferInfo>;
+  data: ToolResponse<TokenTransferData>;
 }
 
 export function TokenTransferCard({ data }: TokenTransferCardProps) {
+  // Handle requiresWallet case
+  if (!data.success && data.data?.requiresWallet) {
+    const { to, amount, tokenAddress } = data.data;
+    const details: Array<{ label: string; value: string }> = [];
+    if (tokenAddress) details.push({ label: 'Token', value: `${tokenAddress.slice(0, 10)}...` });
+    if (amount) details.push({ label: 'Amount', value: amount });
+    if (to) details.push({ label: 'To', value: `${to.slice(0, 10)}...` });
+    return (
+      <WalletRequiredCard
+        title="Token Transfer Pending"
+        details={details.length > 0 ? details : undefined}
+      />
+    );
+  }
+
   if (!data.success || !data.data) {
     return <ErrorCard error={data.error || 'Token transfer failed'} toolName="Token Transfer" />;
   }

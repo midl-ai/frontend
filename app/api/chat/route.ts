@@ -99,6 +99,18 @@ export async function POST(request: Request) {
       onFinish: async ({ response }) => {
         if (!userId) return;
 
+        // Build a map of tool call ID to output from tool messages
+        const toolOutputMap = new Map<string, unknown>();
+        for (const msg of response.messages) {
+          if (msg.role === 'tool' && Array.isArray(msg.content)) {
+            for (const part of msg.content) {
+              if (part.type === 'tool-result' && part.toolCallId) {
+                toolOutputMap.set(part.toolCallId, part.output);
+              }
+            }
+          }
+        }
+
         // Save assistant messages to database
         const assistantMessages = response.messages.filter(
           (m) => m.role === 'assistant'
@@ -114,14 +126,15 @@ export async function POST(request: Request) {
                     return { type: 'text' as const, text: c.text };
                   }
                   if (c.type === 'tool-call') {
-                    // Store tool calls with output-available state for proper rendering
+                    // Look up the tool output from our map
+                    const output = toolOutputMap.get(c.toolCallId) ?? null;
                     return {
                       type: `tool-${c.toolName}` as const,
                       toolCallId: c.toolCallId,
                       toolName: c.toolName,
                       state: 'output-available' as const,
                       input: (c as { input?: unknown }).input || {},
-                      output: null, // Will be populated by tool-result
+                      output,
                     };
                   }
                   return c;

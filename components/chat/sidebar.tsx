@@ -232,8 +232,9 @@ export function Sidebar() {
   );
 
   const handleNewSession = useCallback(() => {
-    router.push('/chat');
-    router.refresh(); // Force refresh to clear cache
+    // Add a unique session key to force component remount
+    const sessionKey = Date.now().toString(36);
+    router.push(`/chat?session=${sessionKey}`);
   }, [router]);
 
   const groupedChats = data?.chats ? groupChatsByDate(data.chats) : null;

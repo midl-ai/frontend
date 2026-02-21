@@ -1,14 +1,31 @@
 'use client';
 
 import { Rocket, ExternalLink } from 'lucide-react';
-import { BaseCard, ErrorCard, DataRow, AddressDisplay } from './base';
+import { BaseCard, ErrorCard, DataRow, AddressDisplay, WalletRequiredCard } from './base';
 import type { ToolResponse, DeployInfo } from '@/lib/ai/tools/types';
 
+// Extended type to handle requiresWallet case
+interface DeployData extends DeployInfo {
+  requiresWallet?: boolean;
+  templateName?: string;
+}
+
 interface DeploymentCardProps {
-  data: ToolResponse<DeployInfo>;
+  data: ToolResponse<DeployData>;
 }
 
 export function DeploymentCard({ data }: DeploymentCardProps) {
+  // Handle requiresWallet case
+  if (!data.success && data.data?.requiresWallet) {
+    const { templateName } = data.data;
+    return (
+      <WalletRequiredCard
+        title="Deployment Pending"
+        details={templateName ? [{ label: 'Template', value: templateName }] : undefined}
+      />
+    );
+  }
+
   if (!data.success || !data.data) {
     return <ErrorCard error={data.error || 'Deployment failed'} toolName="Contract Deploy" />;
   }

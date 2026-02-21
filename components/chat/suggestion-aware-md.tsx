@@ -3,7 +3,6 @@
 import { memo } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface SuggestionAwareMarkdownProps {
@@ -19,16 +18,28 @@ const createMarkdownComponents = (
   onSuggestion?: (suggestion: string) => void
 ): Partial<Components> => ({
   // Links - render as clickable external links
-  a: ({ href, children }) => (
-    <Link
-      href={href || '#'}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-accent hover:text-accent-hover underline underline-offset-2 transition-colors"
-    >
-      {children}
-    </Link>
-  ),
+  a: ({ href, children }) => {
+    // Decode any URL-encoded characters and handle malformed URLs gracefully
+    let safeHref = '#';
+    try {
+      safeHref = href ? decodeURIComponent(href) : '#';
+    } catch {
+      // If decoding fails, use the raw href
+      safeHref = href || '#';
+    }
+
+    // Use regular anchor for external links
+    return (
+      <a
+        href={safeHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-accent hover:text-accent-hover underline underline-offset-2 transition-colors"
+      >
+        {children}
+      </a>
+    );
+  },
   // Ordered lists
   ol: ({ children }) => (
     <ol className="list-decimal list-outside ml-4 my-2">{children}</ol>

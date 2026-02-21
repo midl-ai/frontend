@@ -1,14 +1,33 @@
 'use client';
 
 import { FileEdit } from 'lucide-react';
-import { BaseCard, ErrorCard, DataRow, AddressDisplay } from './base';
+import { BaseCard, ErrorCard, DataRow, AddressDisplay, WalletRequiredCard } from './base';
 import type { ToolResponse, WriteContractInfo } from '@/lib/ai/tools/types';
 
+// Extended type to handle requiresWallet case
+interface WriteContractData extends WriteContractInfo {
+  requiresWallet?: boolean;
+}
+
 interface ContractWriteCardProps {
-  data: ToolResponse<WriteContractInfo>;
+  data: ToolResponse<WriteContractData>;
 }
 
 export function ContractWriteCard({ data }: ContractWriteCardProps) {
+  // Handle requiresWallet case
+  if (!data.success && data.data?.requiresWallet) {
+    const { functionName, contractAddress } = data.data;
+    const details: Array<{ label: string; value: string }> = [];
+    if (functionName) details.push({ label: 'Function', value: functionName });
+    if (contractAddress) details.push({ label: 'Contract', value: `${contractAddress.slice(0, 10)}...` });
+    return (
+      <WalletRequiredCard
+        title="Contract Write Pending"
+        details={details.length > 0 ? details : undefined}
+      />
+    );
+  }
+
   if (!data.success || !data.data) {
     return <ErrorCard error={data.error || 'Contract write failed'} toolName="Contract Write" />;
   }

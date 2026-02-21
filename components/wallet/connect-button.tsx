@@ -46,18 +46,36 @@ const WalletDropdown = memo(function WalletDropdown({
 }: WalletDropdownProps) {
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
-  const copyAddress = useCallback((address: string, type: string) => {
+  const copyAddress = useCallback((e: React.MouseEvent, address: string, type: string) => {
+    e.preventDefault();
+    e.stopPropagation();
     navigator.clipboard.writeText(address);
     setCopiedAddress(type);
     setTimeout(() => setCopiedAddress(null), 2000);
+  }, []);
+
+  // Handle click outside to close
+  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClose();
+  }, [onClose]);
+
+  // Prevent dropdown clicks from closing
+  const handleDropdownClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
   }, []);
 
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 z-40" onClick={onClose} />
+      {/* Backdrop - transparent but clickable */}
+      <div
+        className="fixed inset-0 z-[60]"
+        onClick={handleBackdropClick}
+        style={{ cursor: 'default' }}
+      />
 
       {/* Dropdown */}
       <motion.div
@@ -65,7 +83,8 @@ const WalletDropdown = memo(function WalletDropdown({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -10, scale: 0.95 }}
         transition={{ duration: 0.15 }}
-        className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-border bg-card shadow-lg z-50 overflow-hidden"
+        className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-border bg-card shadow-lg z-[70] overflow-hidden"
+        onClick={handleDropdownClick}
       >
         {/* Header */}
         <div className="px-4 py-3 border-b border-border bg-background-tertiary/50">
@@ -85,7 +104,7 @@ const WalletDropdown = memo(function WalletDropdown({
                 </p>
               </div>
               <button
-                onClick={() => copyAddress(evmAddress, 'evm')}
+                onClick={(e) => copyAddress(e, evmAddress, 'evm')}
                 className="p-1.5 rounded-lg text-foreground-muted hover:text-accent hover:bg-accent/10 transition-all"
               >
                 {copiedAddress === 'evm' ? (
@@ -106,7 +125,7 @@ const WalletDropdown = memo(function WalletDropdown({
                 </p>
               </div>
               <button
-                onClick={() => copyAddress(btcAddress, 'btc')}
+                onClick={(e) => copyAddress(e, btcAddress, 'btc')}
                 className="p-1.5 rounded-lg text-foreground-muted hover:text-accent hover:bg-accent/10 transition-all"
               >
                 {copiedAddress === 'btc' ? (
@@ -125,13 +144,17 @@ const WalletDropdown = memo(function WalletDropdown({
             href="https://blockscout.staging.midl.xyz"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-muted hover:text-foreground hover:bg-background-hover rounded-lg transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
             View on Explorer
           </a>
           <button
-            onClick={onDisconnect}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDisconnect();
+            }}
             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-error hover:bg-error/10 rounded-lg transition-colors"
           >
             <LogOut className="w-4 h-4" />

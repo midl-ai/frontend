@@ -1,14 +1,35 @@
 'use client';
 
 import { Send, ExternalLink } from 'lucide-react';
-import { BaseCard, ErrorCard, DataRow, AddressDisplay } from './base';
+import { BaseCard, ErrorCard, DataRow, AddressDisplay, WalletRequiredCard } from './base';
 import type { ToolResponse, TransferInfo } from '@/lib/ai/tools/types';
 
+// Extended type to handle requiresWallet case
+interface TransferData extends TransferInfo {
+  requiresWallet?: boolean;
+  weiAmount?: string;
+  unit?: string;
+}
+
 interface EVMTransferCardProps {
-  data: ToolResponse<TransferInfo>;
+  data: ToolResponse<TransferData>;
 }
 
 export function EVMTransferCard({ data }: EVMTransferCardProps) {
+  // Handle requiresWallet case - show pending signing card
+  if (!data.success && data.data?.requiresWallet) {
+    const { to, amount, unit } = data.data;
+    return (
+      <WalletRequiredCard
+        title="Transfer Pending"
+        details={[
+          { label: 'To', value: `${to.slice(0, 10)}...${to.slice(-8)}` },
+          { label: 'Amount', value: `${amount} ${unit || 'BTC'}` },
+        ]}
+      />
+    );
+  }
+
   if (!data.success || !data.data) {
     return <ErrorCard error={data.error || 'Transfer failed'} toolName="EVM Transfer" />;
   }

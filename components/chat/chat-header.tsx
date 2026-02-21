@@ -1,6 +1,8 @@
 'use client';
 
+import { useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Plus, Terminal, PanelLeftOpen } from 'lucide-react';
 import { ConnectButton } from '@/components/wallet/connect-button';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
@@ -12,8 +14,16 @@ interface ChatHeaderProps {
 
 /** Chat interface header with wallet connection and navigation */
 export function ChatHeader({ showNewChat = true, onToggleSidebar }: ChatHeaderProps) {
+  const router = useRouter();
+
+  const handleNewChat = useCallback(() => {
+    // Add unique session key to force component remount
+    const sessionKey = Date.now().toString(36);
+    router.push(`/chat?session=${sessionKey}`);
+  }, [router]);
+
   return (
-    <header className="h-14 px-4 border-b border-border bg-background/80 backdrop-blur-sm flex items-center justify-between gap-4 shrink-0">
+    <header className="h-14 px-4 border-b border-border bg-background/80 backdrop-blur-sm flex items-center justify-between gap-4 shrink-0 relative z-50">
       {/* Left section */}
       <div className="flex items-center gap-3">
         {/* Mobile sidebar toggle */}
@@ -44,13 +54,13 @@ export function ChatHeader({ showNewChat = true, onToggleSidebar }: ChatHeaderPr
       {/* Right section */}
       <div className="flex items-center gap-3">
         {showNewChat && (
-          <Link
-            href="/chat"
+          <button
+            onClick={handleNewChat}
             className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-sm font-medium hover:bg-background-hover hover:border-border-hover transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>New Chat</span>
-          </Link>
+          </button>
         )}
 
         <ThemeToggle />
