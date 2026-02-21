@@ -4,15 +4,15 @@ import { useState, useCallback } from 'react';
 import { useAccounts, useEdictRune } from '@midl/react';
 import {
   useAddTxIntention,
-  useSignIntentions,
+  useSignIntention,
   useFinalizeBTCTransaction,
   useSendBTCTransactions,
   useAddCompleteTxIntention,
   useClearTxIntentions,
+  useEVMAddress,
 } from '@midl/executor-react';
-import { encodeFunctionData, parseAbi } from 'viem';
+import { encodeFunctionData, parseAbi, zeroAddress } from 'viem';
 import type { PreparedTransaction } from '@/lib/ai/tools/types';
-import { generateUUID } from '@/lib/utils';
 
 export type TransactionState = 'idle' | 'preparing' | 'signing' | 'broadcasting' | 'success' | 'error';
 
@@ -26,14 +26,15 @@ export interface TransactionResult {
 
 /**
  * Hook for handling MIDL transactions with wallet signing
- * Uses the MIDL executor-react hooks for the full transaction flow
+ * Follows the MIDL flow: Add Intention → Finalize BTC → Sign → Broadcast
  */
 export function useHandleTransaction() {
   const { isConnected } = useAccounts();
+  const evmAddress = useEVMAddress();
 
   // MIDL SDK hooks
-  const { addTxIntentionAsync } = useAddTxIntention();
-  const { signIntentionsAsync } = useSignIntentions();
+  const { addTxIntentionAsync, txIntentions } = useAddTxIntention();
+  const { signIntentionAsync } = useSignIntention();
   const { finalizeBTCTransactionAsync } = useFinalizeBTCTransaction();
   const { sendBTCTransactionsAsync } = useSendBTCTransactions();
   const { addCompleteTxIntentionAsync } = useAddCompleteTxIntention();
@@ -50,35 +51,56 @@ export function useHandleTransaction() {
 
   /**
    * Execute the full MIDL transaction flow:
-   * 1. Add intention (already done before calling this)
-   * 2. Sign with BTC wallet
-   * 3. Finalize BTC transaction
-   * 4. Broadcast
+   * 1. Finalize BTC transaction (creates PSBT)
+   * 2. Sign each intention
+   * 3. Broadcast
    */
-  const executeMidlTransaction = useCallback(async (
+  const executeMidlFlow = useCallback(async (
     explorerUrl: string
   ): Promise<TransactionResult> => {
-    // Generate unique txId for this transaction
-    const txId = generateUUID();
+    console.log('[useHandleTransaction] Starting MIDL flow, intentions:', txIntentions);
+
+    if (txIntentions.length === 0) {
+      throw new Error('No transaction intentions to process');
+    }
+
+    setState('preparing');
+
+    // Step 1: Finalize BTC transaction - creates the PSBT
+    console.log('[useHandleTransaction] Finalizing BTC transaction...');
+    const finalized = await finalizeBTCTransactionAsync({});
+    console.log('[useHandleTransaction] Finalized:', finalized);
+
+    const btcTxId = finalized.tx?.id;
+    const btcTxHex = finalized.tx?.hex;
+
+    if (!btcTxId || !btcTxHex) {
+      throw new Error('Failed to finalize BTC transaction');
+    }
 
     setState('signing');
 
-    // Sign intentions - this triggers wallet popup
-    await signIntentionsAsync({ txId });
+    // Step 2: Sign each intention
+    console.log('[useHandleTransaction] Signing intentions...');
+    for (const intention of txIntentions) {
+      console.log('[useHandleTransaction] Signing intention:', intention);
+      await signIntentionAsync({
+        intention,
+        txId: btcTxId,
+      });
+    }
 
     setState('broadcasting');
 
-    // Finalize and get the BTC transaction
-    const finalized = await finalizeBTCTransactionAsync({});
+    // Step 3: Broadcast
+    console.log('[useHandleTransaction] Broadcasting...');
+    const signedTxs = txIntentions
+      .filter(it => it.signedEvmTransaction)
+      .map(it => it.signedEvmTransaction as `0x${string}`);
 
-    // The finalized result has psbt and tx properties
-    const psbtData = (finalized as { psbt: string }).psbt;
-    const txData = (finalized as { tx?: { id?: string } }).tx;
-
-    // Send the transaction
     await sendBTCTransactionsAsync({
-      serializedTransactions: [],
-      btcTransaction: psbtData,
+      serializedTransactions: signedTxs,
+      btcTransaction: btcTxHex,
     });
 
     // Clear intentions after successful send
@@ -86,14 +108,11 @@ export function useHandleTransaction() {
 
     setState('success');
 
-    // Extract txId from result
-    const resultTxId = txData?.id || txId;
-
     return {
-      btcTxId: resultTxId,
-      explorerUrl: `${explorerUrl}/tx/${resultTxId}`,
+      btcTxId,
+      explorerUrl: `${explorerUrl}/tx/${btcTxId}`,
     };
-  }, [signIntentionsAsync, finalizeBTCTransactionAsync, sendBTCTransactionsAsync, clearTxIntentions]);
+  }, [txIntentions, finalizeBTCTransactionAsync, signIntentionAsync, sendBTCTransactionsAsync, clearTxIntentions]);
 
   /**
    * Execute transaction based on prepared data
@@ -101,11 +120,20 @@ export function useHandleTransaction() {
   const executeTransaction = useCallback(async (
     transaction: PreparedTransaction
   ): Promise<TransactionResult> => {
+    console.log('[useHandleTransaction] executeTransaction called with:', transaction);
+
     if (!isConnected) {
       setState('error');
       const errorResult = { error: 'Wallet not connected' };
       setResult(errorResult);
       throw new Error('Wallet not connected');
+    }
+
+    if (!evmAddress || evmAddress === zeroAddress) {
+      setState('error');
+      const errorResult = { error: 'EVM address not available - please connect wallet' };
+      setResult(errorResult);
+      throw new Error('EVM address not available - please connect wallet');
     }
 
     setState('preparing');
@@ -115,7 +143,7 @@ export function useHandleTransaction() {
 
       switch (transaction.type) {
         case 'evm_transfer': {
-          // Add EVM transfer intention
+          console.log('[useHandleTransaction] Adding EVM transfer intention...');
           await addTxIntentionAsync({
             intention: {
               evmTransaction: {
@@ -126,12 +154,12 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlTransaction(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.explorerUrl);
           break;
         }
 
         case 'token_transfer': {
-          // Encode ERC20 transfer call
+          console.log('[useHandleTransaction] Adding token transfer intention...');
           const data = encodeFunctionData({
             abi: parseAbi(['function transfer(address to, uint256 amount) returns (bool)']),
             functionName: 'transfer',
@@ -148,36 +176,44 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlTransaction(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.explorerUrl);
           break;
         }
 
         case 'bridge_deposit': {
-          // Add deposit intention
+          // For deposits, we need an EVM transaction (even if minimal)
+          // The deposit field adds BTC to our EVM balance
+          console.log('[useHandleTransaction] Adding bridge deposit intention...');
           await addTxIntentionAsync({
             intention: {
+              evmTransaction: {
+                // Self-transfer of 0 wei - just to have an EVM tx
+                to: evmAddress as `0x${string}`,
+                value: BigInt(0),
+                data: '0x',
+              },
               deposit: {
                 satoshis: Number(transaction.satoshis),
               },
             },
             reset: true,
           });
-          txResult = await executeMidlTransaction(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.explorerUrl);
           break;
         }
 
         case 'bridge_withdraw': {
-          // Add complete tx intention for withdrawal
-          // Note: btcAddress is derived from connected wallet, not passed explicitly
+          console.log('[useHandleTransaction] Adding bridge withdrawal intention...');
+          // addCompleteTxIntention creates the proper EVM tx for withdrawal
           await addCompleteTxIntentionAsync({
             satoshis: Number(transaction.satoshis),
           });
-          txResult = await executeMidlTransaction(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.explorerUrl);
           break;
         }
 
         case 'contract_write': {
-          // Parse ABI and encode function call
+          console.log('[useHandleTransaction] Adding contract write intention...');
           const parsedAbi = JSON.parse(transaction.abi);
           const data = encodeFunctionData({
             abi: parsedAbi,
@@ -195,12 +231,12 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlTransaction(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.explorerUrl);
           break;
         }
 
         case 'contract_deploy': {
-          // Contract deployment requires bytecode
+          console.log('[useHandleTransaction] Adding contract deploy intention...');
           if (!transaction.bytecode) {
             throw new Error('Bytecode required for contract deployment');
           }
@@ -213,12 +249,12 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlTransaction(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.explorerUrl);
           break;
         }
 
         case 'rune_transfer': {
-          // Use edictRune for rune transfers
+          console.log('[useHandleTransaction] Transferring rune...');
           setState('signing');
           const runeResult = await edictRuneAsync({
             transfers: [{
@@ -237,9 +273,15 @@ export function useHandleTransaction() {
         }
 
         case 'rune_to_erc20': {
-          // Bridge rune to ERC20 - deposit rune
+          console.log('[useHandleTransaction] Bridging rune to ERC20...');
+          // Rune deposit needs EVM tx + rune deposit
           await addTxIntentionAsync({
             intention: {
+              evmTransaction: {
+                to: evmAddress as `0x${string}`,
+                value: BigInt(0),
+                data: '0x',
+              },
               deposit: {
                 runes: [{
                   id: transaction.runeId,
@@ -249,13 +291,12 @@ export function useHandleTransaction() {
             },
             reset: true,
           });
-          txResult = await executeMidlTransaction(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.explorerUrl);
           break;
         }
 
         case 'erc20_to_rune': {
-          // Bridge ERC20 back to rune - withdrawal
-          // Note: address is ERC20 address (optional, auto-derived)
+          console.log('[useHandleTransaction] Bridging ERC20 to rune...');
           await addCompleteTxIntentionAsync({
             runes: [{
               id: transaction.runeId,
@@ -263,7 +304,7 @@ export function useHandleTransaction() {
               address: transaction.erc20Address as `0x${string}`,
             }],
           });
-          txResult = await executeMidlTransaction(transaction.explorerUrl);
+          txResult = await executeMidlFlow(transaction.explorerUrl);
           break;
         }
 
@@ -274,6 +315,7 @@ export function useHandleTransaction() {
       setResult(txResult);
       return txResult;
     } catch (error) {
+      console.error('[useHandleTransaction] Error:', error);
       setState('error');
       const errorMsg = error instanceof Error ? error.message : 'Transaction failed';
       const errorResult = { error: errorMsg };
@@ -282,10 +324,11 @@ export function useHandleTransaction() {
     }
   }, [
     isConnected,
+    evmAddress,
     addTxIntentionAsync,
     addCompleteTxIntentionAsync,
     edictRuneAsync,
-    executeMidlTransaction,
+    executeMidlFlow,
   ]);
 
   return {
