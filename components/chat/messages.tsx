@@ -8,9 +8,10 @@ import { ToolCallLoader } from './tool-call-loader';
 interface MessagesProps {
   messages: UIMessage[];
   isLoading: boolean;
+  onSuggestion?: (text: string) => void;
 }
 
-export function Messages({ messages, isLoading }: MessagesProps) {
+export function Messages({ messages, isLoading, onSuggestion }: MessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new messages
@@ -22,7 +23,7 @@ export function Messages({ messages, isLoading }: MessagesProps) {
     <div className="h-full overflow-y-auto px-4 py-6">
       <div className="max-w-3xl mx-auto space-y-6">
         {messages.map((message) => (
-          <Message key={message.id} message={message} />
+          <Message key={message.id} message={message} onSuggestion={onSuggestion} />
         ))}
 
         {isLoading && messages[messages.length - 1]?.role === 'user' && (

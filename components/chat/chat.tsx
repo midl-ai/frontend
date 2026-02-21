@@ -105,7 +105,7 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
             </div>
           </div>
         ) : (
-          <Messages messages={messages} isLoading={isLoading} />
+          <Messages messages={messages} isLoading={isLoading} onSuggestion={handleSuggestion} />
         )}
       </div>
 
