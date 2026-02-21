@@ -9,6 +9,11 @@ interface EVMBalanceCardProps {
 }
 
 export function EVMBalanceCard({ data }: EVMBalanceCardProps) {
+  // Handle null data (e.g., when loading from history with missing output)
+  if (!data) {
+    return <ErrorCard error="No data available" toolName="EVM Balance" />;
+  }
+
   if (!data.success || !data.data) {
     return <ErrorCard error={data.error || 'Failed to get balance'} toolName="EVM Balance" />;
   }

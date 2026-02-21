@@ -50,6 +50,16 @@ interface ToolResultRendererProps {
 
 /** Maps tool names to their corresponding card components */
 export function ToolResultRenderer({ toolName, result }: ToolResultRendererProps) {
+  // Handle null/undefined result (e.g., when loading from history with missing output)
+  if (result === null || result === undefined) {
+    return (
+      <ErrorCard
+        error="Tool result not available. This may happen when loading from history."
+        toolName={toolName}
+      />
+    );
+  }
+
   // Cast result to ToolResponse for type safety
   const data = result as ToolResponse<unknown>;
 
