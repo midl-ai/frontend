@@ -1,6 +1,7 @@
 import {
   streamText,
   convertToModelMessages,
+  createUIMessageStream,
   stepCountIs,
   type UIMessage,
 } from 'ai';
@@ -13,6 +14,7 @@ import {
   getChatById,
   updateChatTitle,
   getOrCreateUserByAddress,
+  getMessagesByChatId,
 } from '@/lib/db/queries';
 import { generateUUID } from '@/lib/utils';
 
@@ -58,6 +60,21 @@ export async function POST(request: Request) {
           createdAt: new Date(),
         });
       }
+
+      // Save user message
+      const userMessage = messages[messages.length - 1];
+      if (userMessage?.role === 'user') {
+        await saveMessages({
+          chatId,
+          messages: [
+            {
+              id: userMessage.id,
+              role: 'user',
+              parts: userMessage.parts,
+            },
+          ],
+        });
+      }
     }
 
     // Get system prompt with wallet context
@@ -72,31 +89,38 @@ export async function POST(request: Request) {
     // Convert UI messages to model messages
     const modelMessages = await convertToModelMessages(messages);
 
-    // Create streaming response with tools
-    const result = streamText({
-      model: getModelProvider()(getDefaultModel()),
-      system: systemPrompt,
-      messages: modelMessages,
-      tools,
-      stopWhen: stepCountIs(10), // Allow up to 10 tool calling steps
-      onFinish: async ({ response }) => {
+    // Create UI message stream that properly formats tool results for persistence
+    const stream = createUIMessageStream({
+      execute: ({ writer }) => {
+        const result = streamText({
+          model: getModelProvider()(getDefaultModel()),
+          system: systemPrompt,
+          messages: modelMessages,
+          tools,
+          stopWhen: stepCountIs(10),
+        });
+
+        result.consumeStream();
+        writer.merge(result.toUIMessageStream());
+      },
+      generateId: generateUUID,
+      onFinish: async ({ messages: uiMessages }) => {
         if (!userId) return;
 
-        // Save messages to database
-        const assistantMessages = response.messages.filter(
+        // Filter to get only assistant messages from this response
+        const assistantMessages = uiMessages.filter(
           (m) => m.role === 'assistant'
         );
 
         if (assistantMessages.length > 0) {
-          const messagesToSave = assistantMessages.map((m) => ({
-            id: generateUUID(),
-            role: m.role,
-            parts: Array.isArray(m.content) ? m.content : [{ type: 'text', text: String(m.content) }],
-          }));
-
+          // Save messages with properly formatted parts (including state: 'output-available')
           await saveMessages({
             chatId,
-            messages: messagesToSave,
+            messages: assistantMessages.map((m) => ({
+              id: m.id,
+              role: m.role,
+              parts: m.parts,
+            })),
           });
 
           // Update chat title if this is the first response
@@ -111,10 +135,13 @@ export async function POST(request: Request) {
           }
         }
       },
+      onError: (error) => {
+        console.error('[Chat API] Stream error:', error);
+        return 'An error occurred while processing your request.';
+      },
     });
 
-    // Return UI message stream response for the AI SDK v6 useChat hook
-    return result.toUIMessageStreamResponse();
+    return new Response(stream);
   } catch (error) {
     console.error('[Chat API] Error:', error);
     return new Response(
