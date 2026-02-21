@@ -7,11 +7,12 @@ import { useHandleTransaction, type TransactionState, type TransactionResult } f
 import type { PreparedTransaction } from '@/lib/ai/tools/types';
 
 interface TransactionWrapperProps {
-  children: ReactNode;
+  children?: ReactNode;
   transaction: PreparedTransaction;
   buttonText?: string;
   onSuccess?: (result: TransactionResult) => void;
   onError?: (error: string) => void;
+  onCancel?: () => void;
 }
 
 /** Button styling by state */
@@ -39,6 +40,7 @@ export function TransactionWrapper({
   buttonText = 'Sign & Submit',
   onSuccess,
   onError,
+  onCancel,
 }: TransactionWrapperProps) {
   const { isConnected } = useAccounts();
   const { state, result, executeTransaction, resetState } = useHandleTransaction();
@@ -153,17 +155,26 @@ export function TransactionWrapper({
       )}
 
       {/* Sign & Submit button */}
-      <button
-        onClick={state === 'error' ? handleReset : handleSign}
-        disabled={!isConnected || (state !== 'idle' && state !== 'error')}
-        className={`
-          w-full flex items-center justify-center gap-2
-          py-2.5 px-4 rounded-lg font-medium text-sm
-          transition-all duration-200
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${getButtonStyles(state, isConnected)}
-        `}
-      >
+      <div className={onCancel ? 'flex gap-2' : ''}>
+        {onCancel && state === 'idle' && (
+          <button
+            onClick={onCancel}
+            className="flex-1 py-2.5 px-4 rounded-lg font-medium text-sm bg-zinc-700 hover:bg-zinc-600 text-white transition-colors"
+          >
+            Cancel
+          </button>
+        )}
+        <button
+          onClick={state === 'error' ? handleReset : handleSign}
+          disabled={!isConnected || (state !== 'idle' && state !== 'error')}
+          className={`
+            ${onCancel ? 'flex-1' : 'w-full'} flex items-center justify-center gap-2
+            py-2.5 px-4 rounded-lg font-medium text-sm
+            transition-all duration-200
+            disabled:opacity-50 disabled:cursor-not-allowed
+            ${getButtonStyles(state, isConnected)}
+          `}
+        >
         {state === 'idle' && (
           <>
             <Zap className="w-4 h-4" />
@@ -194,7 +205,8 @@ export function TransactionWrapper({
             Try Again
           </>
         )}
-      </button>
+        </button>
+      </div>
     </div>
   );
 }

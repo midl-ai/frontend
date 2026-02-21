@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback, type KeyboardEvent } from 'react';
-import { Send, Square, Terminal } from 'lucide-react';
+import { Send, Square, Terminal, Mic, MicOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MultimodalInputProps {
@@ -10,6 +10,10 @@ interface MultimodalInputProps {
   onSubmit: (text: string) => void;
   isLoading: boolean;
   stop: () => void;
+  /** Voice mode status */
+  voiceActive?: boolean;
+  /** Voice mode toggle handler */
+  onVoiceToggle?: () => void;
 }
 
 export function MultimodalInput({
@@ -18,6 +22,8 @@ export function MultimodalInput({
   onSubmit,
   isLoading,
   stop,
+  voiceActive = false,
+  onVoiceToggle,
 }: MultimodalInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -98,8 +104,28 @@ export function MultimodalInput({
           </div>
         </div>
 
-        {/* Submit button */}
-        <div className="shrink-0">
+        {/* Action buttons */}
+        <div className="shrink-0 flex items-center gap-2">
+          {/* Voice toggle button */}
+          {onVoiceToggle && (
+            <button
+              type="button"
+              onClick={onVoiceToggle}
+              disabled={isLoading}
+              className={cn(
+                'flex items-center justify-center w-10 h-10 rounded-xl transition-all',
+                'border shadow-sm',
+                voiceActive
+                  ? 'bg-accent text-accent-foreground border-accent'
+                  : 'bg-background-tertiary text-foreground-muted border-border hover:border-border-hover'
+              )}
+              title={voiceActive ? 'Stop voice mode' : 'Start voice mode'}
+            >
+              {voiceActive ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+            </button>
+          )}
+
+          {/* Submit/Stop button */}
           {isLoading ? (
             <button
               onClick={stop}

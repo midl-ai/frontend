@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { estimateGas, getPublicClient } from '@/lib/midl/client';
-import { WEI_PER_BTC } from '@/lib/midl/config';
+import { WEI_PER_BTC } from '@/lib/midl/constants';
 
 export const midl_estimate_gas = tool({
   description:

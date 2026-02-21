@@ -1,5 +1,5 @@
 import { createPublicClient, http, type PublicClient } from 'viem';
-import { getNetworkConfig } from './config';
+import { getNetworkConfig } from './constants';
 
 let publicClient: PublicClient | null = null;
 

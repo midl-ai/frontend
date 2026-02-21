@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { getNetworkConfig, WEI_PER_BTC } from '@/lib/midl/config';
+import { getNetworkConfig, WEI_PER_BTC } from '@/lib/midl/constants';
 import type { EVMTransferTransaction } from '../types';
 
 export const midl_transfer_evm = tool({

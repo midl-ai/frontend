@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getUtxos } from '@/lib/midl/mempool';
-import { SATOSHIS_PER_BTC } from '@/lib/midl/config';
+import { SATOSHIS_PER_BTC } from '@/lib/midl/constants';
 
 export const midl_get_utxos = tool({
   description:

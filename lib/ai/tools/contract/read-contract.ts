@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { readContract } from '@/lib/midl/client';
-import { getNetworkConfig } from '@/lib/midl/config';
+import { getNetworkConfig } from '@/lib/midl/constants';
 
 /** ERC20 ABI - standard token interface */
 const ERC20_ABI = [

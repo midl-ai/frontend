@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getBlock } from '@/lib/midl/client';
-import { getNetworkConfig } from '@/lib/midl/config';
+import { getNetworkConfig } from '@/lib/midl/constants';
 
 export const midl_get_block = tool({
   description: 'Get block information by number or "latest" for the most recent block.',

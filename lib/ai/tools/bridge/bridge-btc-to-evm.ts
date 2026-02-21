@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { getNetworkConfig, SATOSHIS_PER_BTC } from '@/lib/midl/config';
+import { getNetworkConfig, SATOSHIS_PER_BTC } from '@/lib/midl/constants';
 import type { BridgeDepositTransaction } from '../types';
 
 export const midl_bridge_btc_to_evm = tool({

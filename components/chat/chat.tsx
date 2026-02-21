@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useChat, type UIMessage } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { useSWRConfig } from 'swr';
@@ -9,6 +9,9 @@ import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
 import { SuggestedActions } from './suggested-actions';
 import { Terminal } from 'lucide-react';
+import { useVoiceSession } from '@/hooks/useVoiceSession';
+import { useContacts } from '@/hooks/useContacts';
+import { VoiceModeOverlay } from '@/components/voice/VoiceModeOverlay';
 
 interface ChatProps {
   id: string;
@@ -17,11 +20,22 @@ interface ChatProps {
 
 export function Chat({ id, initialMessages = [] }: ChatProps) {
   const [input, setInput] = useState('');
-  const router = useRouter();
+  const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const pathname = usePathname();
   const { mutate } = useSWRConfig();
   const hasUpdatedUrl = useRef(false);
   const isNewChat = pathname === '/chat';
+
+  // Voice session hook
+  const voice = useVoiceSession();
+
+  // Contacts for voice mode
+  const { contacts } = useContacts();
+  const voiceContacts = contacts.map((c) => ({
+    name: c.name,
+    evmAddress: c.evmAddress ?? undefined,
+    btcAddress: c.btcAddress ?? undefined,
+  }));
 
   const { messages, sendMessage, status, stop } = useChat({
     id,
@@ -81,6 +95,23 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
     [sendMessage]
   );
 
+  // Voice mode toggle
+  const handleVoiceToggle = useCallback(() => {
+    if (voice.isActive) {
+      voice.stopSession();
+      setShowVoiceOverlay(false);
+    } else {
+      voice.startSession(voiceContacts);
+      setShowVoiceOverlay(true);
+    }
+  }, [voice, voiceContacts]);
+
+  // Close voice overlay
+  const handleVoiceClose = useCallback(() => {
+    voice.stopSession();
+    setShowVoiceOverlay(false);
+  }, [voice]);
+
   return (
     <div className="flex flex-col h-full relative">
       {/* Messages Area */}
@@ -118,9 +149,16 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
             onSubmit={handleSubmit}
             isLoading={isLoading}
             stop={stop}
+            voiceActive={voice.isActive}
+            onVoiceToggle={handleVoiceToggle}
           />
         </div>
       </div>
+
+      {/* Voice Mode Overlay */}
+      {showVoiceOverlay && (
+        <VoiceModeOverlay voice={voice} onClose={handleVoiceClose} />
+      )}
     </div>
   );
 }

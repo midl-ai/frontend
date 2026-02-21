@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getEvmBalance } from '@/lib/midl/client';
-import { getNetworkConfig, WEI_PER_BTC } from '@/lib/midl/config';
+import { getNetworkConfig, WEI_PER_BTC } from '@/lib/midl/constants';
 
 export const midl_get_evm_balance = tool({
   description: 'Get the BTC balance on the EVM layer for an address. Returns balance in BTC.',

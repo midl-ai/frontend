@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getTransaction } from '@/lib/midl/mempool';
-import { getNetworkConfig, SATOSHIS_PER_BTC } from '@/lib/midl/config';
+import { getNetworkConfig, SATOSHIS_PER_BTC } from '@/lib/midl/constants';
 
 interface BtcTransaction {
   txid: string;

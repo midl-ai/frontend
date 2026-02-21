@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { getNetworkConfig } from '@/lib/midl/config';
+import { getNetworkConfig } from '@/lib/midl/constants';
 
 /** System contract addresses */
 const SYSTEM_CONTRACTS = {

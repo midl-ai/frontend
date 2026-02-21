@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { getNetworkConfig } from '@/lib/midl/config';
+import { getNetworkConfig } from '@/lib/midl/constants';
 
 export const midl_get_network_info = tool({
   description: 'Get information about the MIDL network including chain ID, RPC URL, and explorer URLs.',

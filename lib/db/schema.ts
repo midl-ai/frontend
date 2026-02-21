@@ -32,6 +32,17 @@ export const stream = pgTable('Stream', {
   createdAt: timestamp('createdAt').notNull(),
 });
 
+/** Contact table - stores saved wallet addresses with names for voice mode */
+export const contact = pgTable('Contact', {
+  id: text('id').primaryKey(),
+  userId: text('userId').references(() => user.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(), // "Alex", "John"
+  evmAddress: text('evmAddress'), // 0x...
+  btcAddress: text('btcAddress'), // bc1...
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+});
+
 /** Type exports for use in queries */
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
@@ -41,3 +52,5 @@ export type Message = typeof message.$inferSelect;
 export type NewMessage = typeof message.$inferInsert;
 export type Stream = typeof stream.$inferSelect;
 export type NewStream = typeof stream.$inferInsert;
+export type Contact = typeof contact.$inferSelect;
+export type NewContact = typeof contact.$inferInsert;

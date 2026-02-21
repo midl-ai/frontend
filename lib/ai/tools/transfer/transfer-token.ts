@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { getNetworkConfig } from '@/lib/midl/config';
+import { getNetworkConfig } from '@/lib/midl/constants';
 import type { TokenTransferTransaction } from '../types';
 
 const DEFAULT_DECIMALS = 18;

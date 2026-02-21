@@ -1,4 +1,4 @@
-import { getNetworkConfig } from '@/lib/midl/config';
+import { getNetworkConfig } from '@/lib/midl/constants';
 
 interface WalletContext {
   evmAddress?: string;

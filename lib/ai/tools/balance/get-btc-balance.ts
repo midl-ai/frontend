@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { getBtcBalance, getUtxos } from '@/lib/midl/mempool';
-import { getNetworkConfig, SATOSHIS_PER_BTC } from '@/lib/midl/config';
+import { getNetworkConfig, SATOSHIS_PER_BTC } from '@/lib/midl/constants';
 
 export const midl_get_btc_balance = tool({
   description: 'Get the BTC balance on the Bitcoin layer for an address. Returns confirmed and unconfirmed balance.',
