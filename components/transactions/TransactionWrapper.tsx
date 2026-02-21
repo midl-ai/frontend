@@ -156,7 +156,7 @@ export function TransactionWrapper({
 
       {/* Sign & Submit button */}
       <div className={onCancel ? 'flex gap-2' : ''}>
-        {onCancel && state === 'idle' && (
+        {onCancel && (state === 'idle' || state === 'preparing' || state === 'error') && (
           <button
             onClick={onCancel}
             className="flex-1 py-2.5 px-4 rounded-lg font-medium text-sm bg-zinc-700 hover:bg-zinc-600 text-white transition-colors"

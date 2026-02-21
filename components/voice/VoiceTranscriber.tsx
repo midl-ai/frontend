@@ -4,6 +4,7 @@ import { memo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Bot, Wrench, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ToolResultRenderer } from '@/components/chat/tool-result-renderer';
 import type { TranscriptEntry } from '@/hooks/useVoiceSession';
 
 interface VoiceTranscriberProps {
@@ -28,54 +29,69 @@ const TranscriptItem = memo(function TranscriptItem({
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        'flex gap-3 px-4 py-2',
-        isUser && 'justify-end',
-        isAssistant && 'justify-start',
-        isTool && 'justify-center'
+        'flex flex-col gap-2 px-4 py-2',
+        isUser && 'items-end',
+        isAssistant && 'items-start',
+        isTool && 'items-center'
       )}
     >
-      {/* Avatar for assistant */}
-      {isAssistant && (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
-          <Bot className="w-4 h-4 text-accent" />
-        </div>
-      )}
+      <div className={cn(
+        'flex gap-3',
+        isUser && 'flex-row-reverse',
+      )}>
+        {/* Avatar for assistant */}
+        {isAssistant && (
+          <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
+            <Bot className="w-4 h-4 text-accent" />
+          </div>
+        )}
 
-      {/* Tool icon */}
-      {isTool && (
-        <div className="shrink-0 w-6 h-6 rounded-full bg-warning/20 flex items-center justify-center">
-          {entry.isFinal ? (
-            <Wrench className="w-3 h-3 text-warning" />
-          ) : (
-            <Loader2 className="w-3 h-3 text-warning animate-spin" />
+        {/* Tool icon */}
+        {isTool && (
+          <div className="shrink-0 w-6 h-6 rounded-full bg-warning/20 flex items-center justify-center">
+            {entry.isFinal ? (
+              <Wrench className="w-3 h-3 text-warning" />
+            ) : (
+              <Loader2 className="w-3 h-3 text-warning animate-spin" />
+            )}
+          </div>
+        )}
+
+        {/* Message content */}
+        <div
+          className={cn(
+            'max-w-[80%] rounded-2xl px-4 py-2',
+            isUser && 'bg-secondary/20 text-foreground',
+            isAssistant && 'bg-accent/10 text-foreground',
+            isTool && 'bg-warning/10 text-warning text-sm',
+            !entry.isFinal && 'opacity-70'
+          )}
+        >
+          <p className="text-sm leading-relaxed">
+            {entry.text || (entry.status === 'speaking' ? '...' : '')}
+          </p>
+          {!entry.isFinal && entry.role !== 'tool' && (
+            <span className="inline-block w-1.5 h-4 ml-1 bg-current animate-pulse" />
           )}
         </div>
-      )}
 
-      {/* Message content */}
-      <div
-        className={cn(
-          'max-w-[80%] rounded-2xl px-4 py-2',
-          isUser && 'bg-secondary/20 text-foreground',
-          isAssistant && 'bg-accent/10 text-foreground',
-          isTool && 'bg-warning/10 text-warning text-sm',
-          !entry.isFinal && 'opacity-70'
-        )}
-      >
-        <p className="text-sm leading-relaxed">
-          {entry.text || (entry.status === 'speaking' ? '...' : '')}
-        </p>
-        {!entry.isFinal && entry.role !== 'tool' && (
-          <span className="inline-block w-1.5 h-4 ml-1 bg-current animate-pulse" />
+        {/* Avatar for user */}
+        {isUser && (
+          <div className="shrink-0 w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center">
+            <User className="w-4 h-4 text-secondary" />
+          </div>
         )}
       </div>
 
-      {/* Avatar for user */}
-      {isUser && (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center">
-          <User className="w-4 h-4 text-secondary" />
+      {/* Tool result card - rendered below the transcript entry */}
+      {isTool && entry.isFinal && entry.toolName && entry.toolResult !== undefined ? (
+        <div className="w-full max-w-sm mt-1">
+          <ToolResultRenderer
+            toolName={entry.toolName}
+            result={entry.toolResult}
+          />
         </div>
-      )}
+      ) : null}
     </motion.div>
   );
 });

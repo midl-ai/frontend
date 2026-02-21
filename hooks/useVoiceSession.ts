@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useSWRConfig } from 'swr';
 import { isTransactionTool } from '@/lib/voice/tool-mapping';
 import type { PreparedTransaction } from '@/lib/ai/tools/types';
 
@@ -71,6 +72,9 @@ function generateId(): string {
  * Manages WebRTC connection, audio streams, and tool execution
  */
 export function useVoiceSession(): UseVoiceSessionReturn {
+  // SWR for history refresh after transactions
+  const { mutate } = useSWRConfig();
+
   // Session state
   const [status, setStatus] = useState<VoiceSessionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -557,7 +561,9 @@ export function useVoiceSession(): UseVoiceSessionReturn {
     cleanup();
     setStatus('idle');
     setPendingTransaction(null);
-  }, [cleanup]);
+    // Refresh chat history
+    mutate('/api/history?limit=50');
+  }, [cleanup, mutate]);
 
   /** Called when transaction completes (signed and broadcast) */
   const onTransactionComplete = useCallback(
@@ -593,12 +599,15 @@ export function useVoiceSession(): UseVoiceSessionReturn {
         error: result.error,
       });
 
+      // Refresh chat history in sidebar
+      mutate('/api/history?limit=50');
+
       // Clear pending state
       pendingToolCallRef.current = null;
       setPendingTransaction(null);
       setStatus('connected');
     },
-    [sendToolResult]
+    [sendToolResult, mutate]
   );
 
   /** Called when transaction is cancelled */

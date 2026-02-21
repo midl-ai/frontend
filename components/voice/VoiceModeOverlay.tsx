@@ -1,11 +1,12 @@
 'use client';
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AudioVisualizer } from './AudioVisualizer';
 import { VoiceTranscriber } from './VoiceTranscriber';
+import { VoiceTransactionDetails } from './VoiceTransactionDetails';
 import { TransactionWrapper } from '@/components/transactions/TransactionWrapper';
 import type { UseVoiceSessionReturn } from '@/hooks/useVoiceSession';
 
@@ -60,6 +61,21 @@ export const VoiceModeOverlay = memo(function VoiceModeOverlay({
     },
     [onTransactionComplete]
   );
+
+  // Escape key handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // Don't close if transaction signing is in progress
+        if (status !== 'signing') {
+          handleClose();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [status, handleClose]);
 
   if (!isActive && status !== 'error') {
     return null;
@@ -175,7 +191,9 @@ export const VoiceModeOverlay = memo(function VoiceModeOverlay({
                 onSuccess={handleTransactionSuccess}
                 onError={handleTransactionError}
                 onCancel={onTransactionCancel}
-              />
+              >
+                <VoiceTransactionDetails transaction={pendingTransaction} />
+              </TransactionWrapper>
             </motion.div>
           </div>
         )}
