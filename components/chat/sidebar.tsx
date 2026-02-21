@@ -1,12 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   MessageSquare,
   Plus,
   ChevronLeft,
-  ChevronRight,
   Trash2,
   Loader2,
   Wallet,
@@ -18,6 +17,8 @@ import { cn } from '@/lib/utils';
 import { useState, memo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useSWR from 'swr';
+import { useDefaultAccount } from '@midl/react';
+import { useEVMAddress } from '@midl/executor-react';
 
 // Types
 interface Chat {
@@ -31,16 +32,6 @@ interface HistoryResponse {
   hasMore: boolean;
   nextCursor: string | null;
 }
-
-// Fetcher for SWR
-const fetcher = async (url: string): Promise<HistoryResponse> => {
-  const walletAddress = localStorage.getItem('walletAddress');
-  const res = await fetch(url, {
-    headers: walletAddress ? { 'x-wallet-address': walletAddress } : {},
-  });
-  if (!res.ok) throw new Error('Failed to fetch history');
-  return res.json();
-};
 
 // Group chats by date
 function groupChatsByDate(chats: Chat[]): Record<string, Chat[]> {
@@ -187,35 +178,41 @@ const SIDEBAR_WIDTH = 280;
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
-  const [hasWallet, setHasWallet] = useState(false);
 
-  // Check wallet on mount and listen for storage changes
+  // Get wallet state directly from MIDL hooks (not localStorage)
+  const account = useDefaultAccount();
+  const evmAddress = useEVMAddress();
+
+  const isConnected = !!account;
+  const walletAddress = evmAddress || account?.address;
+
+  // Debug logging
   useEffect(() => {
-    const checkWallet = () => {
-      setHasWallet(!!localStorage.getItem('walletAddress'));
-    };
+    console.log('[Sidebar] Wallet state:', { isConnected, account, evmAddress, walletAddress });
+  }, [isConnected, account, evmAddress, walletAddress]);
 
-    // Initial check
-    checkWallet();
+  // Fetcher that adds wallet headers
+  const fetcher = useCallback(
+    async (url: string): Promise<HistoryResponse> => {
+      if (!walletAddress) {
+        return { chats: [], hasMore: false, nextCursor: null };
+      }
+      const res = await fetch(url, {
+        headers: { 'x-wallet-address': walletAddress },
+      });
+      if (!res.ok) throw new Error('Failed to fetch history');
+      return res.json();
+    },
+    [walletAddress]
+  );
 
-    // Listen for storage changes (when wallet connects/disconnects)
-    window.addEventListener('storage', checkWallet);
-
-    // Also poll for changes (for same-tab updates)
-    const interval = setInterval(checkWallet, 1000);
-
-    return () => {
-      window.removeEventListener('storage', checkWallet);
-      clearInterval(interval);
-    };
-  }, []);
-
-  // Fetch history with SWR
+  // Fetch history with SWR - key includes wallet address to refetch on connect
   const { data, isLoading, mutate } = useSWR<HistoryResponse>(
-    hasWallet ? '/api/history?limit=50' : null,
+    walletAddress ? `/api/history?limit=50&wallet=${walletAddress}` : null,
     fetcher,
-    { revalidateOnFocus: true, refreshInterval: hasWallet ? 5000 : 0 }
+    { revalidateOnFocus: true, refreshInterval: 5000 }
   );
 
   const handleDelete = useCallback(
@@ -228,6 +225,11 @@ export function Sidebar() {
     },
     [mutate]
   );
+
+  const handleNewSession = useCallback(() => {
+    router.push('/chat');
+    router.refresh(); // Force refresh to clear cache
+  }, [router]);
 
   const groupedChats = data?.chats ? groupChatsByDate(data.chats) : null;
 
@@ -245,7 +247,6 @@ export function Sidebar() {
             'h-full flex flex-col',
             'bg-sidebar/95 backdrop-blur-xl',
             'border-r border-sidebar-border/30',
-            // Chip/trapezoid shape with rounded corners
             'm-3 mr-0 rounded-2xl',
             'shadow-xl shadow-black/10'
           )}
@@ -253,8 +254,8 @@ export function Sidebar() {
         >
           {/* New Session Button */}
           <div className="p-4">
-            <Link
-              href="/chat"
+            <button
+              onClick={handleNewSession}
               className={cn(
                 'flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl',
                 'bg-accent text-accent-foreground font-semibold',
@@ -264,12 +265,12 @@ export function Sidebar() {
             >
               <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
               <span>New Session</span>
-            </Link>
+            </button>
           </div>
 
           {/* History Section */}
           <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
-            {!hasWallet ? (
+            {!isConnected ? (
               <div className="px-3 py-8 text-center">
                 <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-3 border border-accent/10">
                   <Wallet className="w-7 h-7 text-accent/60" />
@@ -320,7 +321,7 @@ export function Sidebar() {
         </div>
       </motion.aside>
 
-      {/* Edge Toggle Button - Always visible */}
+      {/* Edge Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
@@ -330,7 +331,6 @@ export function Sidebar() {
           'border border-sidebar-border/50',
           'hover:bg-sidebar-hover transition-all duration-200',
           'shadow-lg shadow-black/10',
-          // Position at sidebar edge
           isOpen ? 'rounded-r-xl' : 'rounded-xl',
           'hover:w-8'
         )}
@@ -340,10 +340,7 @@ export function Sidebar() {
         }}
         aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
       >
-        <motion.div
-          animate={{ rotate: isOpen ? 0 : 180 }}
-          transition={{ duration: 0.2 }}
-        >
+        <motion.div animate={{ rotate: isOpen ? 0 : 180 }} transition={{ duration: 0.2 }}>
           <ChevronLeft className="w-4 h-4 text-foreground-muted" />
         </motion.div>
       </button>
