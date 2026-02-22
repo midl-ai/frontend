@@ -5,25 +5,25 @@ import { useRef } from 'react';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 
 const ARCHITECTURE_POINTS = [
-  'Universal MCP Server compatibility',
-  'Built-in safety checks for transactions',
-  'Context-aware wallet management',
-  'Extensible plugin architecture',
-  'Dual transport (stdio + HTTP)',
-  'Rich UI responses with cards',
+  'Works with Claude Desktop, Cursor, VS Code',
+  '9 plugin categories with 27 tools',
+  'Full Runes support (balance, transfer, bridge)',
+  'Contract deployment via natural language',
+  'Dual transport: stdio + HTTP REST API',
+  'Generative UI cards for visual responses',
 ];
 
 const CODE_EXAMPLE = `{
-  "agent": "MIDL-Core",
-  "version": "1.0.0",
-  "tools": [
-    "btc_balance",
-    "evm_deploy",
-    "runes_transfer",
-    "bridge_btc_to_evm"
-  ],
-  "safety": "strict",
-  "transport": ["stdio", "http"]
+  "mcpServers": {
+    "midl": {
+      "command": "npx",
+      "args": ["tsx", "src/index.ts"],
+      "env": {
+        "MIDL_PRIVATE_KEY": "0x...",
+        "MIDL_RPC_URL": "https://rpc.midl.xyz"
+      }
+    }
+  }
 }`;
 
 /** Architecture showcase section */
@@ -76,7 +76,7 @@ export function ArchitectureSection() {
 
             {/* Link */}
             <motion.a
-              href="https://github.com"
+              href="https://github.com/midl-ai/mcp-server"
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0 }}
@@ -110,7 +110,7 @@ export function ArchitectureSection() {
                     <div className="w-3 h-3 rounded-full bg-success/80" />
                   </div>
                   <span className="text-xs text-foreground-muted font-mono">
-                    config.json
+                    claude_desktop_config.json
                   </span>
                 </div>
 

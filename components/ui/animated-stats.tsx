@@ -2,7 +2,7 @@
 
 import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
 import { useRef, useEffect, memo } from 'react';
-import { Cpu, Layers, Shield, Zap } from 'lucide-react';
+import { Wrench, FolderTree, ArrowLeftRight, Gem } from 'lucide-react';
 
 interface StatProps {
   value: number;
@@ -88,25 +88,23 @@ export const AnimatedStats = memo(function AnimatedStats() {
   const stats = [
     {
       value: 27,
-      suffix: '+',
-      label: 'Blockchain Tools',
-      icon: <Cpu className="w-6 h-6" />,
+      label: 'MCP Tools',
+      icon: <Wrench className="w-6 h-6" />,
+    },
+    {
+      value: 9,
+      label: 'Categories',
+      icon: <FolderTree className="w-6 h-6" />,
     },
     {
       value: 2,
-      label: 'Chain Layers',
-      icon: <Layers className="w-6 h-6" />,
+      label: 'Transports',
+      icon: <ArrowLeftRight className="w-6 h-6" />,
     },
     {
-      value: 100,
-      suffix: '%',
-      label: 'Non-Custodial',
-      icon: <Shield className="w-6 h-6" />,
-    },
-    {
-      value: 1,
-      label: 'Conversation',
-      icon: <Zap className="w-6 h-6" />,
+      value: 4,
+      label: 'Rune Operations',
+      icon: <Gem className="w-6 h-6" />,
     },
   ];
 

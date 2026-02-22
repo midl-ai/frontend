@@ -55,7 +55,7 @@ export function CTASection() {
             </Link>
 
             <a
-              href="https://github.com"
+              href="https://github.com/midl-ai/mcp-server"
               target="_blank"
               rel="noopener noreferrer"
               className="px-10 py-5 rounded-2xl border border-border bg-background/50 backdrop-blur-sm hover:bg-background-hover transition-all flex items-center justify-center gap-3 font-medium hover:border-accent/30"

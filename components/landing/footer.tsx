@@ -6,18 +6,18 @@ import { Terminal, Github, Twitter } from 'lucide-react';
 const FOOTER_LINKS = {
   Product: [
     { label: 'Terminal', href: '/chat' },
-    { label: 'Documentation', href: 'https://github.com' },
-    { label: 'API Reference', href: 'https://github.com' },
+    { label: 'Documentation', href: '/docs' },
+    { label: 'Tools Reference', href: '/docs/tools' },
   ],
   Resources: [
-    { label: 'Getting Started', href: 'https://github.com' },
-    { label: 'Examples', href: 'https://github.com' },
-    { label: 'MCP Server', href: 'https://github.com' },
+    { label: 'Getting Started', href: '/docs/getting-started' },
+    { label: 'Examples', href: '/docs/examples' },
+    { label: 'MCP Server', href: 'https://github.com/midl-ai/mcp-server' },
   ],
   Community: [
-    { label: 'GitHub', href: 'https://github.com' },
-    { label: 'Twitter', href: 'https://twitter.com' },
-    { label: 'Discord', href: 'https://discord.com' },
+    { label: 'GitHub', href: 'https://github.com/midl-ai' },
+    { label: 'Twitter', href: 'https://x.com/midl_xyz' },
+    { label: 'MIDL Network', href: 'https://midl.xyz' },
   ],
 };
 
@@ -38,12 +38,12 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-foreground-muted max-w-xs">
-              The intelligence layer for Bitcoin. Talk to the blockchain with natural language.
+              The first MCP for Bitcoin+EVM. Deploy contracts, transfer tokens, and bridge assets through natural language.
             </p>
             {/* Social */}
             <div className="flex gap-3 pt-2">
               <a
-                href="https://github.com"
+                href="https://github.com/midl-ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-lg bg-background-tertiary flex items-center justify-center text-foreground-muted hover:text-foreground hover:bg-background-hover transition-all"
@@ -52,7 +52,7 @@ export function Footer() {
                 <Github className="w-4 h-4" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://x.com/midl_xyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-lg bg-background-tertiary flex items-center justify-center text-foreground-muted hover:text-foreground hover:bg-background-hover transition-all"

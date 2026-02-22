@@ -5,53 +5,53 @@ import { useRef, memo } from 'react';
 import {
   Layers,
   Code2,
-  ShieldCheck,
+  Gem,
   Zap,
-  RefreshCw,
-  Terminal,
+  ArrowLeftRight,
+  LayoutGrid,
 } from 'lucide-react';
 
 const FEATURES = [
   {
     icon: Layers,
-    title: 'Multi-Layer Orchestration',
+    title: 'Bitcoin + EVM Unified',
     description:
-      'Seamlessly interact across Bitcoin L1 and EVM L2. One prompt handles both chains.',
+      'One conversation controls both layers. Query BTC balances, deploy EVM contracts, bridge assets — all in the same chat.',
     color: 'accent',
+  },
+  {
+    icon: Gem,
+    title: 'Rune Operations',
+    description:
+      'Full Runes support: check balances, transfer between addresses, and bridge Runes to ERC20 tokens on the EVM layer.',
+    color: 'secondary',
   },
   {
     icon: Code2,
-    title: 'Generative Contracts',
+    title: 'Smart Contract Deployment',
     description:
-      'Deploy complex Solidity contracts simply by describing their logic in plain English.',
-    color: 'secondary',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Non-Custodial Security',
-    description:
-      'AI constructs transactions, you sign them. Your keys never leave your wallet.',
+      '"Deploy an ERC20 called BitcoinCoffee" → live contract in seconds. No Hardhat, no config, no boilerplate.',
     color: 'tertiary',
   },
   {
-    icon: Zap,
-    title: 'Instant Execution',
+    icon: ArrowLeftRight,
+    title: 'Cross-Layer Bridging',
     description:
-      'From natural language to on-chain transaction in seconds. No boilerplate required.',
+      'Move BTC between layers seamlessly. Deposit satoshis to EVM, withdraw back to Bitcoin — built-in bridge operations.',
     color: 'accent',
   },
   {
-    icon: RefreshCw,
-    title: 'Cross-Chain Bridging',
+    icon: Zap,
+    title: 'MCP Protocol',
     description:
-      'Move assets between Bitcoin and EVM seamlessly with built-in bridge operations.',
+      'Works in Claude Desktop, Cursor, VS Code, and any MCP-compatible client. Dual transport: stdio + HTTP.',
     color: 'secondary',
   },
   {
-    icon: Terminal,
-    title: 'MCP Standard',
+    icon: LayoutGrid,
+    title: 'Generative UI',
     description:
-      'Built on Model Context Protocol for universal AI agent compatibility.',
+      'Rich visual cards for every response — balance displays, transaction receipts, Rune portfolios. Not plain text.',
     color: 'tertiary',
   },
 ];
@@ -128,15 +128,15 @@ export function FeaturesSection() {
           className="text-center mb-16"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
-            Capabilities
+            27 Tools · 9 Categories
           </span>
           <h2 className="text-4xl font-bold mb-4">
-            Everything you need to{' '}
-            <span className="gradient-text">talk to Bitcoin</span>
+            Full blockchain access via{' '}
+            <span className="gradient-text">natural language</span>
           </h2>
           <p className="text-foreground-muted max-w-2xl mx-auto text-lg">
-            Built on the Model Context Protocol (MCP), MIDL connects AI agents
-            directly to blockchain operations.
+            Query balances, deploy contracts, transfer tokens, bridge assets, manage Runes —
+            all through conversation in Claude Desktop or Cursor.
           </p>
         </motion.div>
 

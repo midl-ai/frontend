@@ -55,10 +55,9 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]"
             >
-              The Intelligence
+              The First MCP for
               <br />
-              Layer for{' '}
-              <span className="gradient-text">Bitcoin</span>.
+              <span className="gradient-text">Bitcoin+EVM</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -67,9 +66,9 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-xl text-foreground-muted max-w-xl leading-relaxed"
             >
-              Stop visiting websites. Start talking to{' '}
-              <span className="text-foreground font-medium">Bitcoin</span>.
-              Bridge assets, deploy contracts, and query the chain with natural language.
+              Deploy contracts, transfer tokens, and bridge assets through{' '}
+              <span className="text-foreground font-medium">natural language</span>.
+              No SDK. No setup. Just ask.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -87,7 +86,7 @@ export function HeroSection() {
               </Link>
 
               <a
-                href="https://github.com"
+                href="https://github.com/midl-ai/mcp-server"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-8 py-4 rounded-xl border border-border bg-background hover:bg-background-hover transition-all flex items-center justify-center gap-2 font-medium hover:border-accent/30"
@@ -101,19 +100,23 @@ export function HeroSection() {
             <motion.div
               variants={fadeInUp}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="pt-8 flex items-center gap-8 text-sm text-foreground-muted"
+              className="pt-8 flex flex-wrap items-center gap-6 text-sm text-foreground-muted"
             >
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                <span>Mainnet Ready</span>
+                <span>Bitcoin L1 + EVM L2</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-accent" />
-                <span>27+ Tools</span>
+                <span>27 Tools</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-secondary" />
-                <span>MCP Protocol</span>
+                <span>9 Categories</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-tertiary" />
+                <span>Runes Support</span>
               </div>
             </motion.div>
           </motion.div>

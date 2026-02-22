@@ -25,9 +25,9 @@ export function StatsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold mb-3">Protocol at a Glance</h2>
+          <h2 className="text-3xl font-bold mb-3">Built for MIDL</h2>
           <p className="text-foreground-muted">
-            One conversation to rule all blockchain operations
+            Comprehensive tooling for Bitcoin L1 + EVM L2 hybrid blockchain
           </p>
         </motion.div>
 
