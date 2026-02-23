@@ -8,7 +8,7 @@ import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
 
-const NAV_LINKS = [
+const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: 'Capabilities', href: '#features' },
   { label: 'Architecture', href: '#architecture' },
   { label: 'Documentation', href: '/docs' },
