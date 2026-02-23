@@ -271,16 +271,6 @@ Same 27 tools, two interfaces, covering both user types.
 
 This bridges the gap between CLI efficiency and GUI polish.
 
-### Competitive Landscape
-
-| Project | Scope | Chat UI | MCP Server | Voice | Runes | BTC+EVM |
-|---------|-------|---------|------------|-------|-------|---------|
-| VeChain Terminal | VeChain | Yes | Yes | No | N/A | No |
-| Stacks Terminal | Stacks | Yes | Yes | No | N/A | No |
-| **MIDL.AI** | MIDL | **Yes** | **Yes** | **Yes** | **Yes** | **Yes** |
-
-No direct competitors for MIDL. Closest analogues (VeChain, Stacks) target different chains and lack voice mode.
-
 ## Technical Architecture
 
 ### Bitcoin L1 + EVM L2 Hybrid
@@ -299,38 +289,7 @@ MIDL Protocol uniquely combines Bitcoin's UTXO model (L1) with EVM's account mod
 
 Plugin-based architecture with dual transport support (stdio for local development + HTTP for remote clients). Each plugin category contains specialized tools that return structured responses and rich UI cards.
 
-### Tech Stack
-
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| **AI** | Vercel AI SDK | v6.0.90 |
-| | Anthropic Claude | Sonnet 3.5 |
-| | OpenAI GPT-4 | Turbo + Realtime |
-| **Frontend** | Next.js | 16.1.6 |
-| | React | 19.2.4 |
-| | TypeScript | 5.9.3 |
-| **Database** | PostgreSQL | 16 |
-| | Drizzle ORM | 0.45.1 |
-| | Redis | 7 |
-| **Styling** | TailwindCSS | 4.1.18 |
-| | Framer Motion | 12.34.2 |
-| **MIDL** | @midl/core | 3.0.2 |
-| | @midl/executor | 3.0.2 |
-| | @midl/viem | 2.45.0 |
-| **Solidity** | solc | 0.8.33 |
-| **MCP** | @modelcontextprotocol/sdk | 1.26.0 |
-
-## AI Attribution
-
-Claude (Anthropic) provided:
-- Code generation for all 27 tools
-- Architecture decisions (plugin system, generative UI, dual transport)
-- Debugging complex integration issues (WASM bundling, viem configuration, MCP setup, Drizzle schemas)
-- Documentation writing (6 doc pages)
-- TypeScript type safety enforcement
-
-**Methodology:** Full AI pair programming - human-driven product vision and UX design, AI-assisted implementation, testing, debugging, and documentation. Claude had full context access to reference codebases (VeChain Terminal, Stacks Terminal) and official MIDL SDK documentation.
-
+## License
 ## License
 
 MIT - 100% open source
