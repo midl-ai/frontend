@@ -23,16 +23,6 @@ Repos: [midl-frontend](https://github.com/midl-ai/midl-frontend) · [midl-mcp-se
 
 ---
 
-## Quick Overview
-
-**What it is:** MIDL.AI is an AI-powered terminal for the MIDL blockchain (Bitcoin L1 + EVM L2 hybrid). It’s two apps — a web chat UI and an MCP server — that expose the same 27 blockchain tools through natural language.
-
-**What it’s meant to do:** Let users and developers interact with MIDL without SDKs or manual signing: check balances, manage Runes, read/write contracts, deploy Solidity, and bridge BTC↔EVM via chat, voice, or Claude Desktop/Cursor. One sentence (e.g. *“Deploy an ERC20 called BitcoinCoffee with 1M supply”*) returns a deployed contract and explorer link.
-
-**Who it’s for:** Developers building on MIDL who want AI-assisted workflows in the IDE (MCP) or via web chat, and end users who prefer managing BTC/Runes/tokens through conversation instead of traditional wallet UIs.
-
----
-
 ## What it is
 
 Talk to the MIDL blockchain in plain language. Two apps, same 27 tools:

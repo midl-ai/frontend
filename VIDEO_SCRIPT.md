@@ -1,352 +1,391 @@
-# MIDL.AI - Hackathon Video Script
+# MIDL.AI - Hackathon Demo Video Script
 ## "The First AI Terminal for Bitcoin+EVM Hybrid Chain"
-### Duration: ~6 minutes
+### Duration: 5 minutes
 
 ---
 
-## INTRO (0:00 - 0:30)
+## Demo Sequence
 
-**[Show MIDL.AI homepage with animated logo and hero section]**
+### 1. Orientation (30 seconds)
 
-> "What if you could deploy smart contracts, bridge Bitcoin, and manage runes just by talking?  What if blockchain interaction was as simple as having a conversation?
+**[Show midl-ai.xyz homepage]**
 
-> This is MIDL.AI - the first AI-powered MCP terminal for MIDL Protocol, the world's first Bitcoin L1 + EVM L2 hybrid blockchain."
+> "This is MIDL.AI — the first AI-powered terminal for MIDL Protocol, the world's first Bitcoin L1 + EVM L2 hybrid blockchain.
 
-**[Show tagline: "Talk to Your Blockchain"]**
+> MIDL combines Bitcoin's security with EVM's programmability. But this power comes with complexity. That's where MIDL.AI comes in — making blockchain interaction as simple as conversation."
 
----
+**[Click into chat interface]**
 
-## THE PROBLEM (0:30 - 1:30)
-
-**[Split screen: Show complex CLI commands vs confused user]**
-
-> "Let's talk about what's broken in blockchain UX today.
-
-> **Problem 1: Dual-Layer Complexity**
-> MIDL Protocol combines Bitcoin's UTXO model with EVM's account model. That means users need to understand TWO completely different systems - Bitcoin transactions AND Ethereum-style smart contracts. It's powerful, but overwhelming.
-
-> **Problem 2: No Developer Tools**
-> If you're building on MIDL, there's no simple interface. No SDK. No AI integration. You're writing raw RPC calls and managing both Bitcoin UTXOs and EVM accounts manually.
-
-> **Problem 3: CLI Hell**
-> Want to deploy a contract? That's 10 commands. Bridge some BTC? Another 15. Transfer a rune? Good luck remembering the syntax.
-
-**[Show frustrated developer with multiple terminal windows]**
-
-> "In 2026, we can talk to AI about ANYTHING... except our blockchain. That's what we're fixing."
+> "Let me show you."
 
 ---
 
-## THE SOLUTION (1:30 - 2:30)
+### 2. Check Balance (30 seconds)
 
-**[Show MIDL.AI interface with clean chat UI]**
+**[Type in chat]**
+> *"What's my balance?"*
 
-> "MIDL.AI is TWO things:
-
-> **First: An AI Chat Terminal**
-> A beautiful Next.js interface where you interact with MIDL through natural language. Ask questions. Deploy contracts. Bridge assets. Transfer runes. All through conversation.
-
-> **Second: An MCP Server**
-> A standalone Model Context Protocol server that works with Claude Desktop, Cursor, and any MCP client. Install once, use everywhere.
-
-> **The Power: 27 Tools Across 9 Categories**
-> - Network tools for system info
-> - Balance tools for checking funds
-> - Transfer tools for moving assets
-> - Deploy tools with Solidity templates
-> - Contract tools for reading and verification
-> - Bridge tools for BTC↔EVM movement
-> - Runes tools for Bitcoin Rune protocol
-> - Bitcoin tools for UTXO management
-> - Utility tools for conversions and lookups
-
-**[Show grid of tool categories with icons]**
-
-> "This isn't a prototype. This is production software with PostgreSQL persistence, Redis caching, voice mode, and comprehensive error handling."
-
----
-
-## TECHNICAL DEEP DIVE (2:30 - 3:30)
-
-**[Show architecture diagram or code snippets]**
-
-> "Let me show you what makes this technically unique.
-
-> **Hybrid Chain Abstraction**
-> Bitcoin uses UTXOs. Ethereum uses accounts. They're fundamentally different. We abstract this complexity. You say 'Bridge 0.5 BTC' - we handle UTXO selection, transaction building, L1 submission, bridge monitoring, and L2 confirmation. Automatically.
-
-> **Generative UI**
-> Most AI chats just show text. We built custom React components for every tool result. Transaction cards with live status updates. Explorer links. Action buttons. Beautiful dark mode.
-
-> **MCP Architecture**
-> We're one of the first full-featured MCP servers with a plugin system. Each category is a plugin. Each plugin has multiple tools. We support dual transports - stdio for desktop AND HTTP for remote clients.
-
-> **Voice Mode**
-> OpenAI Realtime API integration. Speak your command. Get voice responses. Watch transactions execute. The future is voice-controlled Web3.
-
-> **Production Infrastructure**
-> PostgreSQL for chat history. Redis for long-running operations. Drizzle ORM. Vercel AI SDK v6. Server-side signing. Environment validation. Comprehensive logging. This isn't hackathon code - this is enterprise-grade."
-
-**[Show tech stack badges: Next.js 16, React 19, PostgreSQL, Redis]**
-
----
-
-## LIVE DEMO (3:30 - 5:00)
-
-**[Screen recording of complete flow]**
-
-> "Let me show you how powerful this is.
-
-> **Demo 1: Deploy an ERC20 Token**"
-
-**[Type in chat: "Deploy an ERC20 token called DemoToken with symbol DEMO and 1 million initial supply"]**
-
-> "Watch this. I just asked in plain English."
-
-**[Show AI response with code compilation, deployment transaction, contract address]**
-
-> "MIDL.AI compiled the Solidity, deployed to MIDL L2, and gave me the contract address with an explorer link. 30 seconds. Done.
-
-> **Demo 2: Check Balances**"
-
-**[Type: "What's my balance?"]**
-
-> "Simple question."
-
-**[Show formatted response with BTC L1 balance and EVM L2 balance]**
-
-> "It checks BOTH layers automatically. Bitcoin UTXO balance on L1, EVM account balance on L2. One command.
-
-> **Demo 3: Bridge BTC to EVM**"
-
-**[Type: "Bridge 0.1 BTC to my EVM address"]**
-
-> "Now the real magic - cross-layer bridging."
-
-**[Show bridge transaction card with status updates]**
-
-> "Building transaction... Submitting to L1... Waiting for confirmations... Monitoring bridge contract... Done! My EVM balance just updated. That's Bitcoin security with EVM programmability.
-
-> **Demo 4: Voice Mode**"
-
-**[Click voice mode button, show microphone icon]**
-
-**[Speak]** "What's the current block number?"
-
-**[Show voice response with synthesized speech]**
-
-> "Voice input. Voice output. No typing. Just talking to your blockchain.
-
-> **Demo 5: Rune Transfer**"
-
-**[Type: "Transfer 50 UNCOMMON•GOODS rune to kaspa:qr..."]**
-
-> "Bitcoin Runes - the new fungible token standard on Bitcoin. Full support."
-
-**[Show rune transfer transaction with confirmation]**
-
-> "Transaction submitted. Confirmed. Rune transferred. That's how easy it should be."
-
----
-
-## FOR DEVELOPERS (5:00 - 5:30)
-
-**[Show Claude Desktop with MIDL MCP installed]**
-
-> "For developers, MIDL.AI is a game-changer.
-
-> **Install in Claude Desktop:**
-```json
-{
-  "mcpServers": {
-    "midl": {
-      "command": "node",
-      "args": ["/path/to/midl-mcp-server/dist/index.js"]
-    }
-  }
-}
+**[AI response shows]**
+```
+→ get_evm_balance, get_btc_balance
+← Balance card displays:
+   Bitcoin L1: 2.5 BTC
+   EVM L2: 1.8 BTC
+   [Explorer links shown]
 ```
 
-> Five minutes to install. Now Claude can deploy contracts, bridge assets, transfer runes - all from your IDE.
+> "Notice how it checks both layers automatically. Bitcoin UTXO balance on L1, EVM account balance on L2. One question, both answers."
 
-**[Show Cursor with MIDL tools]**
+---
 
-> "Works in Cursor too. Code generation WITH blockchain interaction. Deploy your contract and test it in the same conversation.
+### 3. The Magic Moment — Deploy Contract (60 seconds)
 
-> **Build Your Own Tools:**
-> Our plugin architecture is open. Fork the repo. Add your own tools. Share with the community."
+**[Type in chat]**
+> *"Deploy an ERC20 token called BitcoinCoffee with symbol BCOF and 1 million initial supply"*
 
-**[Show code snippet of plugin structure]**
-
-```typescript
-export class MyPlugin extends PluginBase {
-  @Tool({ name: 'my_tool', schema: mySchema })
-  async execute(params) {
-    // Your implementation
-  }
-}
+**[Show AI thinking, then response]**
+```
+→ deploy_contract (AI generates Solidity, compiles, deploys)
+← Contract deployment card shows:
+   Contract: BitcoinCoffee (BCOF)
+   Address: 0x8f3C...6A063
+   Supply: 1,000,000 BCOF
+   Block: 12346
+   Gas Used: 245,000
+   [Blockscout explorer link]
 ```
 
-> "That's it. Full TypeScript support. Type safety everywhere."
+> "Watch this. The AI generated the Solidity code, compiled it using solc, deployed it to MIDL testnet, and gave me the contract address with an explorer link.
+
+> I didn't configure Hardhat. I didn't write a deployment script. I didn't expose my private key. Zero setup. It just works."
+
+**[Click explorer link to verify]**
+
+> "And here it is live on Blockscout."
 
 ---
 
-## IMPACT & INNOVATION (5:30 - 6:00)
+### 4. Read Contract State (45 seconds)
 
-**[Show feature comparison or impact metrics]**
+**[Type in chat]**
+> *"Check the total supply of BitcoinCoffee"*
 
-> "Let's recap what we've built:
+**[AI response]**
+```
+→ read_contract (totalSupply function)
+← Contract read card shows:
+   Function: totalSupply()
+   Returns: 1,000,000 BCOF
+   Contract: 0x8f3C...6A063
+```
 
-> ✅ **First AI terminal for Bitcoin+EVM hybrid chain**
-> ✅ **27 production-ready tools across 9 categories**
-> ✅ **Dual interface: Web chat + MCP server**
-> ✅ **Generative UI with custom React components**
-> ✅ **Voice mode with OpenAI Realtime API**
-> ✅ **PostgreSQL + Redis infrastructure**
-> ✅ **Comprehensive documentation (6 pages)**
-> ✅ **100% open source, MIT licensed**
-
-> **Live Right Now:**
-> - midl-ai.xyz - Chat interface
-> - mcp.midl-ai.xyz - MCP server docs
-> - github.com/midl-ai - Source code
-
-> This is the future of blockchain interaction. No CLIs. No hex addresses. No confusion. Just conversation.
-
-> **MIDL.AI: Talk to Your Blockchain.**
-
-> Built for MIDL VibeHack 2026. Thank you."
-
-**[Show MIDL.AI logo and website]**
+> "Simple contract read. No ABI hunting. No web3 setup. Just ask."
 
 ---
 
-## B-ROLL SUGGESTIONS
+### 5. Transfer Tokens (45 seconds)
 
-- Code editor showing tool implementations
-- Split screen: CLI commands vs chat interface
-- Transaction confirmation animations (confetti)
-- Voice mode waveform animation
-- Network diagram showing Bitcoin L1 ↔ EVM L2 bridge
-- Side-by-side: Before (complex terminal) vs After (simple chat)
-- Real blockchain explorer showing confirmed transactions
-- Mobile view of chat interface
-- Dark mode toggle with smooth transition
-- Database visualization showing chat persistence
+**[Type in chat]**
+> *"Transfer 100 BCOF to 0x742d35Cc6634C0532925a3b844Bc9e7595f2bD78"*
 
----
+**[AI response]**
+```
+→ transfer_token
+← Transaction card shows:
+   Status: Confirmed
+   Amount: 100 BCOF
+   To: 0x742d...2bD78
+   Tx Hash: 0xabc123...
+   Block: 12347
+   Gas: 52,000
+   [Explorer link]
+```
 
-## KEY PHRASES TO EMPHASIZE
-
-1. **"First AI terminal for Bitcoin+EVM hybrid chain"**
-2. **"27 tools across 9 categories"**
-3. **"Talk to your blockchain"**
-4. **"No CLI required"**
-5. **"Production-grade infrastructure"**
-6. **"Dual interface: Chat + MCP"**
-7. **"Voice-controlled Web3"**
-8. **"Bitcoin security + EVM programmability"**
+> "Transaction submitted, confirmed in ~5 seconds. Full receipt with gas used, block confirmation, explorer link."
 
 ---
 
-## VISUAL ASSETS NEEDED
+### 6. Voice Mode Demo (30 seconds)
 
-### Diagrams
-- [ ] Problem statement diagram (Bitcoin UTXO + EVM complexity)
-- [ ] Solution architecture (Frontend + MCP + MIDL Protocol)
-- [ ] MCP server architecture (Plugin system)
-- [ ] Frontend architecture (Generative UI flow)
-- [ ] Technical deep dive (Data flow diagram)
+**[Click voice mode button]**
+
+**[Speak]**
+> *"What's the current block number?"*
+
+**[AI responds audibly + shows card]**
+```
+Voice: "The current block is 12,348 on MIDL testnet."
+Card: Block #12,348
+      Timestamp: 2 seconds ago
+      Network: Testnet (0x3A99)
+```
+
+> "Voice mode works too. OpenAI Realtime API integration. Speak your command, get voice + visual response."
+
+---
+
+### 7. Runes Showcase (45 seconds)
+
+**[Return to text input]**
+
+**[Type]**
+> *"What Runes do I have?"*
+
+**[AI response]**
+```
+→ get_runes
+← Rune portfolio table:
+   | Rune ID     | Name            | Balance  |
+   |-------------|-----------------|----------|
+   | 840000:1    | UNCOMMON•GOODS  | 1,000    |
+   | 840001:2    | RARE•TREASURE   | 500      |
+   [ERC20 bridge available for each]
+```
+
+> "MIDL supports Bitcoin Runes — fungible tokens on Bitcoin L1. We've integrated full Rune management: balance queries, transfers, and bridging to ERC20 on the EVM layer."
+
+---
+
+### 8. MCP Server Demo (30 seconds)
+
+**[Switch to Claude Desktop screen recording]**
+
+> "Everything you just saw is also available as an MCP server for Claude Desktop and Cursor."
+
+**[Show Claude Desktop with MIDL tools loaded]**
+
+**[Type in Claude]**
+> *"Show me the MIDL system contracts"*
+
+**[Claude responds with MCP UI card]**
+```
+→ midl_get_system_contracts
+← System Contracts table:
+   Executor: 0x0000...0001
+   Bridge: 0x0000...0002
+   Rune Factory: 0x0000...0003
+   [All with explorer links]
+```
+
+> "Same 27 tools. Two interfaces. One for end users at midl-ai.xyz. One for developers in their IDE."
+
+---
+
+### 9. Closing (15 seconds)
+
+**[Show both interfaces side by side]**
+
+> "MIDL.AI: The first AI terminal for Bitcoin+EVM hybrid chain.
+
+> 27 tools across 9 categories. Generative UI. Voice mode. MCP integration. Production-ready. Open source.
+
+> Live now at midl-ai.xyz"
+
+**[Show URLs]**
+```
+midl-ai.xyz
+mcp.midl-ai.xyz
+github.com/midl-ai
+```
+
+---
+
+## Key Talking Points
+
+### Opening Hook
+- **"First MCP for MIDL"** — No existing AI tooling for this Bitcoin+EVM hybrid
+- **Problem statement** — MIDL's power comes with complexity (BIP322, intention-based tx, dual layers)
+- **Solution** — Natural language makes it invisible
+
+### Magic Moment
+- **"Deploy an ERC20"** — Zero Hardhat setup, no deployment scripts, instant result
+- **Emphasize:** Generated code + compiled + deployed + returned address
+- **Visual proof:** Click to Blockscout to verify it's actually live
+
+### Differentiation
+- **27 tools** — Complete coverage: read, write, deploy, transfer, bridge
+- **Dual interface** — Chat terminal (midl-ai.xyz) + MCP server (Claude Desktop)
+- **Voice mode** — OpenAI Realtime API integration
+- **Generative UI** — Not just text, rich visual cards everywhere
+
+### Technical Credibility
+- **Production stack:** Next.js 16, React 19, PostgreSQL, Redis
+- **AI infrastructure:** Vercel AI SDK v6, Anthropic, OpenAI
+- **MIDL integration:** Official SDK (@midl/core, @midl/executor, @midl/viem)
+- **Code quality:** TypeScript strict mode, 300-line file limit, tested against testnet
+
+### Call to Action
+- **Try it:** midl-ai.xyz
+- **Install MCP:** mcp.midl-ai.xyz
+- **Open source:** github.com/midl-ai
+
+---
+
+## Pre-Demo Checklist
+
+- [ ] Wallet funded with testnet BTC (minimum 1 BTC for gas)
+- [ ] Chat interface tested at midl-ai.xyz
+- [ ] Voice mode tested and working
+- [ ] Claude Desktop with MIDL MCP installed and verified
+- [ ] Blockscout explorer open in tab for verification clicks
+- [ ] Network: testnet (not mainnet)
+- [ ] Browser: no ad blockers interfering with WebSocket
+- [ ] Microphone permissions granted for voice mode
+- [ ] Screen recording software tested (OBS, QuickTime, etc.)
+- [ ] Internet connection stable (for RPC calls)
+
+---
+
+## Visual Assets Needed
 
 ### Screenshots
-- [ ] MIDL.AI homepage (hero section)
-- [ ] Chat interface with tool results
-- [ ] Voice mode active state
-- [ ] Claude Desktop with MIDL MCP
-- [ ] Documentation pages
-- [ ] Dark/light mode comparison
-- [ ] Mobile responsive view
+- [ ] midl-ai.xyz homepage with clean chat interface
+- [ ] Balance card showing both L1 and L2 balances
+- [ ] Contract deployment card with all details
+- [ ] Transaction receipt card with confirmation
+- [ ] Rune portfolio table with multiple runes
+- [ ] MCP UI card in Claude Desktop
+- [ ] Voice mode active state with waveform
+- [ ] System contracts table
 
-### Animations
-- [ ] Logo reveal
-- [ ] Tool grid showcase
-- [ ] Transaction confirmation flow
-- [ ] Voice waveform
-- [ ] Bridge operation sequence
+### Screen Recordings
+- [ ] Full demo flow (5 minutes)
+- [ ] Deploy contract sequence (emphasize speed)
+- [ ] Voice mode interaction (audio + visual)
+- [ ] Claude Desktop with MIDL MCP tools
 
----
-
-## HACKATHON CATEGORIES THIS TARGETS
-
-1. **Innovation Track**: First AI terminal for hybrid Bitcoin+EVM chain
-2. **Developer Tools**: MCP server with 27 tools
-3. **User Experience**: Natural language interface + voice mode
-4. **Technical Excellence**: Production infrastructure with PostgreSQL/Redis
-5. **Completeness**: Comprehensive docs, dual interface, open source
+### B-Roll
+- [ ] Code editor showing tool implementations (if needed)
+- [ ] Blockscout explorer showing confirmed transactions
+- [ ] Network diagram: Bitcoin L1 ↔ EVM L2
+- [ ] Tool category grid (9 categories, 27 tools)
 
 ---
 
-## BACKUP TALKING POINTS
+## Demo Flow Variations
 
-### If Asked: "Why MIDL?"
-> "MIDL Protocol is unique - it's the ONLY blockchain that combines Bitcoin's security with EVM's programmability. But that power comes with complexity. MIDL.AI makes it accessible."
+### If Demo Runs Short (< 5 min)
 
-### If Asked: "How is this different from ChatGPT plugins?"
-> "Three ways: (1) We're purpose-built for MIDL's hybrid architecture. (2) We use the Model Context Protocol standard, not proprietary APIs. (3) We provide a standalone MCP server that works with ANY MCP client."
+Add:
+- Bridge demo: *"Bridge 0.1 BTC from L1 to L2"*
+- Contract write: *"Call the increment function on the Counter contract"*
+- Gas estimation: *"Estimate gas for transferring 50 tokens"*
 
-### If Asked: "Is this production-ready?"
-> "Absolutely. PostgreSQL persistence. Redis caching. Comprehensive error handling. Type-safe TypeScript. Voice mode. We've deployed it live at midl-ai.xyz. Try it yourself."
+### If Demo Runs Long (> 5 min)
 
-### If Asked: "What about security?"
-> "Server-side signing with secure key management. Environment variable validation. No private keys exposed to the client. Transaction signing requires explicit confirmation."
+Cut:
+- Voice mode demo (mention but don't show)
+- Runes showcase (mention capability but skip demo)
+- MCP server demo (mention but focus on web interface)
 
-### If Asked: "Can I contribute?"
-> "100% open source. MIT license. Fork the repo. Add tools. Submit PRs. We'd love community contributions."
+### If Technical Issues Occur
 
----
-
-## CLOSING SHOT
-
-**[MIDL.AI logo with tagline]**
-
-> "MIDL.AI - Talk to Your Blockchain"
-
-**[Show all three URLs]**
-- midl-ai.xyz
-- mcp.midl-ai.xyz
-- github.com/midl-ai
-
-**[Fade to black with hackathon info]**
-
-> "Built for MIDL VibeHack 2026"
-> "February 9-28, 2026"
+**Fallback Options:**
+1. Pre-recorded screen capture of successful operations
+2. Show screenshots of completed transactions on Blockscout
+3. Walk through codebase showing the 27 tool implementations
+4. Focus on architecture explanation with diagrams
 
 ---
 
-## PRODUCTION NOTES
+## Audience-Specific Variations
 
-### Video Length
-Target: 5-6 minutes
-Maximum: 7 minutes
-Minimum: 4 minutes
+### For Technical Judges
 
-### Pacing
-- Intro: Fast and exciting
-- Problem: Clear and relatable
-- Solution: Comprehensive but not overwhelming
-- Demo: Smooth and confident
-- Technical: Impressive but accessible
-- Closing: Inspiring and actionable
+Emphasize:
+- Plugin architecture (PluginBase → ToolBase pattern)
+- Dual transport (stdio + HTTP)
+- Type safety (TypeScript strict, Zod schemas)
+- Error handling (structured responses, never throw)
+- Testing (all tools tested against testnet)
 
-### Music
-- Intro: Upbeat, tech-forward
-- Demo: Lighter, let the UI shine
-- Closing: Triumphant, memorable
+### For Business Judges
 
-### Tone
-- Confident but not arrogant
-- Technical but accessible
-- Excited about innovation
-- Welcoming to developers
+Emphasize:
+- User experience (conversational vs CLI)
+- Market gap (first for MIDL, no competitors)
+- Adoption potential (lowers barrier to entry)
+- Completeness (27 tools, 2 interfaces, production-ready)
+- Documentation (6 doc pages at midl-ai.xyz/docs)
 
-Good luck! This is a winning project! 🚀
+### For Design Judges
+
+Emphasize:
+- Generative UI pattern (custom React components per tool)
+- Visual consistency (all cards follow design system)
+- Dark/light mode support
+- Mobile responsiveness
+- Voice mode UX (audio + visual confirmation)
+
+---
+
+## Closing Variations
+
+### Standard Close
+> "MIDL.AI is live at midl-ai.xyz. Try it yourself. Install the MCP server. Build something. It's 100% open source. Thank you."
+
+### Confident Close
+> "This is the future of blockchain interaction. No CLIs. No SDKs. Just conversation. MIDL.AI — talk to your blockchain."
+
+### Community Close
+> "We're just getting started. This is open source. MIT license. Fork it. Build on it. Add your own tools. Let's make blockchain accessible together."
+
+---
+
+## Post-Demo Q&A Prep
+
+### Expected Questions
+
+**Q: "Is this production-ready?"**
+A: "Yes. PostgreSQL persistence, Redis caching, comprehensive error handling, tested against testnet. It's live at midl-ai.xyz."
+
+**Q: "How does voice mode work?"**
+A: "OpenAI Realtime API with function calling. Audio input/output via Web Audio API. Same 27 tools, just voice-triggered."
+
+**Q: "What about security?"**
+A: "Server-side signing with MIDL_PRIVATE_KEY environment variable. Never exposed to client. Transaction confirmation required before execution."
+
+**Q: "Can I use this in my own app?"**
+A: "Yes. The MCP server supports HTTP transport. JSON-RPC style. Integrate it as a REST endpoint in your existing architecture."
+
+**Q: "How is this different from ChatGPT plugins?"**
+A: "Three ways: (1) Purpose-built for MIDL's hybrid architecture. (2) Uses Model Context Protocol standard, not proprietary APIs. (3) Dual interface — web chat + MCP server for Claude/Cursor."
+
+**Q: "What's next?"**
+A: "Mainnet deployment. Multi-wallet support (MetaMask, Rabby). More contract templates (NFTs, DEX). Community plugin system."
+
+---
+
+## Technical Difficulties Troubleshooting
+
+### RPC Connection Issues
+- Switch to backup RPC endpoint
+- Mention "network latency" and continue with pre-recorded fallback
+
+### Voice Mode Fails
+- Skip voice demo, mention it works
+- Focus on text-based interactions
+
+### Transaction Takes Too Long
+- Explain: "Waiting for block confirmation — this is real blockchain interaction"
+- Show pending transaction card
+- Continue with other demos while it confirms
+
+### Claude Desktop MCP Not Responding
+- Skip MCP demo
+- Focus on web interface
+- Mention: "MCP integration is fully functional, documented at mcp.midl-ai.xyz"
+
+---
+
+## Success Metrics
+
+Demo succeeds if judges see:
+1. Contract deployment from natural language (magic moment)
+2. Both Bitcoin L1 and EVM L2 interactions (hybrid chain)
+3. Rich visual responses (generative UI differentiation)
+4. Either voice mode OR MCP server (innovation showcase)
+5. Live verification on Blockscout (proof of production)
+
+**Minimum viable demo:** Items 1, 2, 3, and 5
+**Ideal demo:** All 5 items + smooth delivery under 5 minutes
