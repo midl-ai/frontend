@@ -59,7 +59,10 @@ const stdioConfig = `{
   }
 }`;
 
-const httpConfig = `# Start the HTTP server
+const httpConfig = `# Live hosted MCP endpoint (no setup required):
+https://mcp.midl-ai.xyz/mcp
+
+# Or run locally:
 pnpm start:http
 
 # Server runs on http://localhost:3001
@@ -190,8 +193,21 @@ export default function McpServerPage() {
             <h3 className="text-lg font-semibold">HTTP Transport</h3>
           </div>
           <p className="text-foreground-muted">
-            REST API for remote integrations, dashboards, and bots.
+            REST API for remote integrations, dashboards, and bots. Use our hosted endpoint or self-host.
           </p>
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/10 border border-secondary/20">
+            <Globe className="w-4 h-4 text-secondary flex-shrink-0" />
+            <span className="text-sm text-foreground-muted">Live endpoint:</span>
+            <a
+              href="https://mcp.midl-ai.xyz/mcp"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-mono text-secondary hover:underline"
+            >
+              https://mcp.midl-ai.xyz/mcp
+            </a>
+            <ExternalLink className="w-3 h-3 text-secondary" />
+          </div>
           <CodeBlock code={httpConfig} filename="Terminal" />
         </div>
       </motion.section>

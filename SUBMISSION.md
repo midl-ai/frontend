@@ -5,7 +5,7 @@
 
   **AI-powered terminal for the Bitcoin L1 + EVM L2 hybrid chain**
 
-  [Live Demo](https://midl-ai.xyz) · [MCP Setup](https://mcp.midl-ai.xyz) · [Docs](https://midl-ai.xyz/docs) · [GitHub](https://github.com/midl-ai)
+  [Live Demo](https://midl-ai.xyz) · [MCP Setup](https://mcp.midl-ai.xyz/mcp) · [Docs](https://midl-ai.xyz/docs) · [GitHub](https://github.com/midl-ai)
 
 </div>
 
@@ -16,10 +16,10 @@
 | Link | What |
 |------|------|
 | [midl-ai.xyz](https://midl-ai.xyz) | Chat terminal (voice supported) |
-| [mcp.midl-ai.xyz](https://mcp.midl-ai.xyz) | Add to Claude Desktop / Cursor |
+| [mcp.midl-ai.xyz](https://mcp.midl-ai.xyz/mcp) | Add to Claude Desktop / Cursor |
 | [midl-ai.xyz/docs](https://midl-ai.xyz/docs) | Documentation |
 
-Repos: [midl-frontend](https://github.com/midl-ai/midl-frontend) · [midl-mcp-server](https://github.com/midl-ai/midl-mcp-server)
+Repos: [frontend](https://github.com/midl-ai/frontend) · [mcp-server](https://github.com/midl-ai/mcp-server)
 
 ---
 

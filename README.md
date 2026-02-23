@@ -8,11 +8,11 @@
   *Natural language commands. Bitcoin security. EVM compatibility.*
 
   [![Website](https://img.shields.io/badge/Website-midl--ai.xyz-blue)](https://midl-ai.xyz)
-  [![MCP Server](https://img.shields.io/badge/MCP-mcp.midl--ai.xyz-green)](https://mcp.midl-ai.xyz)
+  [![MCP Server](https://img.shields.io/badge/MCP-mcp.midl--ai.xyz-green)](https://mcp.midl-ai.xyz/mcp)
   [![Documentation](https://img.shields.io/badge/Docs-midl--ai.xyz%2Fdocs-orange)](https://midl-ai.xyz/docs)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-  [Live Demo](https://midl-ai.xyz) • [MCP Server](https://mcp.midl-ai.xyz) • [Documentation](https://midl-ai.xyz/docs)
+  [Live Demo](https://midl-ai.xyz) • [MCP Server](https://mcp.midl-ai.xyz/mcp) • [Documentation](https://midl-ai.xyz/docs)
 
 </div>
 
@@ -155,7 +155,7 @@ Visit [midl-ai.xyz/docs](https://midl-ai.xyz/docs) for full documentation includ
 
 ```bash
 # Clone repository
-git clone https://github.com/midl-ai/midl-frontend
+git clone https://github.com/midl-ai/frontend
 cd midl-frontend
 
 # Install dependencies
@@ -177,7 +177,7 @@ pnpm dev
 
 ```bash
 # Clone MCP server repository
-git clone https://github.com/midl-ai/midl-mcp-server
+git clone https://github.com/midl-ai/mcp-server
 cd midl-mcp-server
 
 # Install dependencies
@@ -271,10 +271,10 @@ pnpm db:studio  # Open Drizzle Studio
 | Resource | URL |
 |----------|-----|
 | **Live Terminal** | [midl-ai.xyz](https://midl-ai.xyz) |
-| **MCP Server** | [mcp.midl-ai.xyz](https://mcp.midl-ai.xyz) |
+| **MCP Server** | [mcp.midl-ai.xyz](https://mcp.midl-ai.xyz/mcp) |
 | **Documentation** | [midl-ai.xyz/docs](https://midl-ai.xyz/docs) |
-| **GitHub (Frontend)** | [github.com/midl-ai/midl-frontend](https://github.com/midl-ai/midl-frontend) |
-| **GitHub (MCP Server)** | [github.com/midl-ai/midl-mcp-server](https://github.com/midl-ai/midl-mcp-server) |
+| **GitHub (Frontend)** | [github.com/midl-ai/frontend](https://github.com/midl-ai/frontend) |
+| **GitHub (MCP Server)** | [github.com/midl-ai/mcp-server](https://github.com/midl-ai/mcp-server) |
 | **MIDL Protocol** | [midl.xyz](https://midl.xyz) |
 
 ## Environment Variables
@@ -337,6 +337,6 @@ Claude (Anthropic) assisted extensively with code generation, architecture desig
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791)
 ![Redis](https://img.shields.io/badge/Redis-7-DC382D)
 
-[Website](https://midl-ai.xyz) • [MCP Server](https://mcp.midl-ai.xyz) • [Documentation](https://midl-ai.xyz/docs)
+[Website](https://midl-ai.xyz) • [MCP Server](https://mcp.midl-ai.xyz/mcp) • [Documentation](https://midl-ai.xyz/docs)
 
 </div>

@@ -184,7 +184,7 @@ Card: Block #12,348
 **[Show URLs]**
 ```
 midl-ai.xyz
-mcp.midl-ai.xyz
+mcp.midl-ai.xyz/mcp
 github.com/midl-ai
 ```
 
@@ -216,7 +216,7 @@ github.com/midl-ai
 
 ### Call to Action
 - **Try it:** midl-ai.xyz
-- **Install MCP:** mcp.midl-ai.xyz
+- **Install MCP:** mcp.midl-ai.xyz/mcp
 - **Open source:** github.com/midl-ai
 
 ---
@@ -374,7 +374,7 @@ A: "Mainnet deployment. Multi-wallet support (MetaMask, Rabby). More contract te
 ### Claude Desktop MCP Not Responding
 - Skip MCP demo
 - Focus on web interface
-- Mention: "MCP integration is fully functional, documented at mcp.midl-ai.xyz"
+- Mention: "MCP integration is fully functional, documented at mcp.midl-ai.xyz/mcp"
 
 ---
 
