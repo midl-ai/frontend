@@ -106,15 +106,15 @@ We built a complete toolkit covering every aspect of MIDL Protocol:
 
 This isn't a hackathon demo — it's production software:
 
-- ✅ **Database**: PostgreSQL + Drizzle ORM for chat persistence
-- ✅ **Caching**: Redis + resumable streams for long-running operations
-- ✅ **Security**: Server-side signing, environment variable validation
-- ✅ **AI**: Vercel AI SDK v6 with streaming tool calls
-- ✅ **Voice**: OpenAI Realtime API integration with Web Audio
-- ✅ **Error Handling**: Comprehensive error codes and user-friendly messages
-- ✅ **Type Safety**: Full TypeScript with strict mode
-- ✅ **Testing**: Unit tests for critical business logic
-- ✅ **Documentation**: 6 documentation pages with examples
+- **Database**: PostgreSQL + Drizzle ORM for chat persistence
+- **Caching**: Redis + resumable streams for long-running operations
+- **Security**: Server-side signing, environment variable validation
+- **AI**: Vercel AI SDK v6 with streaming tool calls
+- **Voice**: OpenAI Realtime API integration with Web Audio
+- **Error Handling**: Comprehensive error codes and user-friendly messages
+- **Type Safety**: Full TypeScript with strict mode
+- **Testing**: Unit tests for critical business logic
+- **Documentation**: 6 documentation pages with examples
 
 ## Architecture
 
@@ -200,7 +200,7 @@ Behind the scenes:
 7. Notify user when EVM balance updates
 ```
 
-All of this happens automatically. User just sees: ✅ Bridge complete.
+All of this happens automatically. User just sees: Bridge complete.
 
 ## Features & User Experience
 
@@ -214,10 +214,10 @@ All of this happens automatically. User just sees: ✅ Bridge complete.
 
 **Generative UI:**
 Every tool renders a beautiful UI component:
-- ✅ Transaction cards with status indicators
-- 🔗 Explorer links for transparency
-- 📊 Balance displays with formatted amounts
-- 🎯 Action buttons for next steps
+- Transaction cards with status indicators
+- Explorer links for transparency
+- Balance displays with formatted amounts
+- Action buttons for next steps
 
 **Voice Mode:**
 Speak your commands. Get voice responses. Perfect for mobile or hands-free operation.
@@ -295,10 +295,10 @@ Move assets between Bitcoin L1 and EVM L2:
 **User:** "Deploy an ERC20 token called MyToken with symbol MTK and 1 million initial supply"
 
 **MIDL.AI:**
-1. ✅ Compiles Solidity using solc 0.8.33
-2. ✅ Deploys to MIDL L2
-3. ✅ Waits for confirmation
-4. 🎉 Returns contract address + explorer link
+1. Compiles Solidity using solc 0.8.33
+2. Deploys to MIDL L2
+3. Waits for confirmation
+4. Returns contract address + explorer link
 
 **Time:** ~30 seconds
 
@@ -307,11 +307,11 @@ Move assets between Bitcoin L1 and EVM L2:
 **User:** "Bridge 0.1 BTC to my EVM wallet"
 
 **MIDL.AI:**
-1. ✅ Checks BTC balance on L1
-2. ✅ Builds bridge transaction
-3. ✅ Submits to bridge contract
-4. ✅ Monitors confirmation
-5. 🎉 Notifies when EVM balance updates
+1. Checks BTC balance on L1
+2. Builds bridge transaction
+3. Submits to bridge contract
+4. Monitors confirmation
+5. Notifies when EVM balance updates
 
 **Time:** ~2-3 minutes (Bitcoin block time)
 
@@ -320,22 +320,22 @@ Move assets between Bitcoin L1 and EVM L2:
 **User:** "Transfer 100 UNCOMMON•GOODS rune to kaspa:qr..."
 
 **MIDL.AI:**
-1. ✅ Validates rune balance
-2. ✅ Builds Rune edict transaction
-3. ✅ Submits to Bitcoin L1
-4. 🎉 Returns transaction ID
+1. Validates rune balance
+2. Builds Rune edict transaction
+3. Submits to Bitcoin L1
+4. Returns transaction ID
 
 **Time:** ~10 seconds
 
 ### Scenario 4: Voice Interaction
 
-**User:** 🎤 "What's my balance?"
+**User:** "What's my balance?"
 
-**MIDL.AI:** 🔊 "You have 1.5 BTC on Bitcoin L1 and 0.3 BTC worth of assets on EVM L2"
+**MIDL.AI:** "You have 1.5 BTC on Bitcoin L1 and 0.3 BTC worth of assets on EVM L2"
 
-**User:** 🎤 "Deploy a counter contract"
+**User:** "Deploy a counter contract"
 
-**MIDL.AI:** 🔊 "Deploying... Done! Your counter contract is at 0xabc..."
+**MIDL.AI:** "Deploying... Done! Your counter contract is at 0xabc..."
 
 ## Impact & Innovation
 
@@ -539,16 +539,16 @@ Studied successful implementations:
 ### Claude's Role
 
 Claude (Anthropic) provided:
-- ✅ Code generation for all 27 tools
-- ✅ Architecture decisions (plugin system, dual transport)
-- ✅ Debugging complex integration issues:
+- Code generation for all 27 tools
+- Architecture decisions (plugin system, dual transport)
+- Debugging complex integration issues:
   - WASM bundling with solc
   - viem custom chain configuration
   - MCP transport setup
   - Drizzle schema design
-- ✅ Documentation writing
-- ✅ Error handling patterns
-- ✅ TypeScript type safety enforcement
+- Documentation writing
+- Error handling patterns
+- TypeScript type safety enforcement
 
 ### Methodology
 
@@ -636,6 +636,6 @@ Join our community:
 
 [Website](https://midl-ai.xyz) • [MCP Server](https://mcp.midl-ai.xyz) • [Documentation](https://midl-ai.xyz/docs) • [GitHub](https://github.com/midl-ai)
 
-Built with ❤️ for MIDL VibeHack 2026
+Built for MIDL VibeHack 2026
 
 </div>

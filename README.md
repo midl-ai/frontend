@@ -63,12 +63,12 @@ MIDL Protocol is unique — it combines Bitcoin's security (L1) with EVM compati
 
 ### 4. Production-Ready Infrastructure
 
-- ✅ PostgreSQL + Drizzle ORM for chat persistence
-- ✅ Redis + resumable streams for long-running operations
-- ✅ Server-side signing with secure key management
-- ✅ Vercel AI SDK v6 with tool streaming
-- ✅ Comprehensive error handling and logging
-- ✅ Voice mode with OpenAI Realtime API
+- PostgreSQL + Drizzle ORM for chat persistence
+- Redis + resumable streams for long-running operations
+- Server-side signing with secure key management
+- Vercel AI SDK v6 with tool streaming
+- Comprehensive error handling and logging
+- Voice mode with OpenAI Realtime API
 
 ## Architecture
 
