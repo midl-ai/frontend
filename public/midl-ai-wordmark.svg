@@ -1,0 +1,46 @@
+<svg width="320" height="80" viewBox="0 0 320 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- MIDL.AI Wordmark -->
+
+  <defs>
+    <linearGradient id="wGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+
+  <!-- The stylized m -->
+  <path d="M 8 58
+           C 8 58, 9 40, 14 32
+           C 19 24, 26 23, 32 30
+           C 38 37, 40 48, 41 52
+           C 42 47, 46 35, 54 28
+           C 62 21, 72 21, 80 30
+           C 88 39, 90 52, 90 52
+           C 90 48, 94 36, 102 29
+           C 110 22, 120 24, 126 32
+           C 132 40, 132 58, 132 58"
+        stroke="url(#wGrad)"
+        stroke-width="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"/>
+
+  <!-- IDL text -->
+  <text x="140" y="56"
+        font-family="system-ui, -apple-system, sans-serif"
+        font-size="42"
+        font-weight="700"
+        fill="white"
+        letter-spacing="-1">IDL</text>
+
+  <!-- Dot -->
+  <circle cx="232" cy="50" r="5" fill="#F97316"/>
+
+  <!-- AI -->
+  <text x="245" y="56"
+        font-family="system-ui, -apple-system, sans-serif"
+        font-size="42"
+        font-weight="700"
+        fill="white"
+        letter-spacing="-1">AI</text>
+</svg>

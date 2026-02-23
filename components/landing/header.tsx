@@ -1,20 +1,23 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Terminal, ArrowRight, Menu, X } from 'lucide-react';
+import { ArrowRight, Menu, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 
 const NAV_LINKS = [
   { label: 'Capabilities', href: '#features' },
   { label: 'Architecture', href: '#architecture' },
-  { label: 'Documentation', href: 'https://github.com', external: true },
+  { label: 'Documentation', href: '/docs' },
 ];
 
 /** Site header with navigation */
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   return (
     <motion.header
@@ -25,16 +28,15 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-bold text-xl tracking-tight"
-        >
-          <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center border border-accent/20">
-            <Terminal className="w-4 h-4 text-accent" />
-          </div>
-          <span>
-            MIDL<span className="text-accent">.AI</span>
-          </span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src={resolvedTheme === 'dark' ? '/midl-ai-wordmark.svg' : '/midl-ai-wordmark-light.svg'}
+            alt="MIDL.AI"
+            width={120}
+            height={32}
+            className="h-8 w-auto"
+            priority
+          />
         </Link>
 
         {/* Desktop Navigation */}

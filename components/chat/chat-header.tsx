@@ -2,10 +2,12 @@
 
 import { useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Plus, Terminal, PanelLeftOpen } from 'lucide-react';
+import { Plus, PanelLeftOpen } from 'lucide-react';
 import { ConnectButton } from '@/components/wallet/connect-button';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { useTheme } from 'next-themes';
 
 interface ChatHeaderProps {
   showNewChat?: boolean;
@@ -15,6 +17,7 @@ interface ChatHeaderProps {
 /** Chat interface header with wallet connection and navigation */
 export function ChatHeader({ showNewChat = true, onToggleSidebar }: ChatHeaderProps) {
   const router = useRouter();
+  const { theme, resolvedTheme } = useTheme();
 
   const handleNewChat = useCallback(() => {
     // Add unique session key to force component remount
@@ -40,14 +43,16 @@ export function ChatHeader({ showNewChat = true, onToggleSidebar }: ChatHeaderPr
         {/* Logo/Home link */}
         <Link
           href="/"
-          className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition-opacity"
+          className="flex items-center hover:opacity-80 transition-opacity"
         >
-          <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center border border-accent/20">
-            <Terminal className="w-4 h-4 text-accent" />
-          </div>
-          <span className="hidden sm:inline">
-            MIDL<span className="text-accent">.AI</span>
-          </span>
+          <Image
+            src={resolvedTheme === 'dark' ? '/midl-ai-wordmark.svg' : '/midl-ai-wordmark-light.svg'}
+            alt="MIDL.AI"
+            width={100}
+            height={28}
+            className="h-7 w-auto"
+            priority
+          />
         </Link>
       </div>
 

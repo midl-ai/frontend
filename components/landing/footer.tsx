@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Terminal, Github, Twitter } from 'lucide-react';
+import Image from 'next/image';
+import { Github, Twitter } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 const FOOTER_LINKS = {
   Product: [
@@ -23,19 +25,22 @@ const FOOTER_LINKS = {
 
 /** Site footer */
 export function Footer() {
+  const { resolvedTheme } = useTheme();
+
   return (
     <footer className="border-t border-border bg-background-secondary py-16">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16">
           {/* Brand column */}
           <div className="col-span-2 md:col-span-1 space-y-4">
-            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center border border-accent/20">
-                <Terminal className="w-4 h-4 text-accent" />
-              </div>
-              <span>
-                MIDL<span className="text-accent">.AI</span>
-              </span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src={resolvedTheme === 'dark' ? '/midl-ai-wordmark.svg' : '/midl-ai-wordmark-light.svg'}
+                alt="MIDL.AI"
+                width={120}
+                height={32}
+                className="h-8 w-auto"
+              />
             </Link>
             <p className="text-sm text-foreground-muted max-w-xs">
               The first MCP for Bitcoin+EVM. Deploy contracts, transfer tokens, and bridge assets through natural language.

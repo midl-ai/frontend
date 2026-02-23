@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import {
   Rocket,
   Wrench,
@@ -17,6 +19,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 const docsNavigation = [
   {
@@ -84,24 +87,31 @@ function NavLink({ item, onClick }: { item: typeof docsNavigation[0]; onClick?: 
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2 font-bold">
-            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center border border-accent/20">
-              <Terminal className="w-4 h-4 text-accent" />
-            </div>
-            <span>MIDL<span className="text-accent">.AI</span></span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src={resolvedTheme === 'dark' ? '/midl-ai-wordmark.svg' : '/midl-ai-wordmark-light.svg'}
+              alt="MIDL.AI"
+              width={100}
+              height={28}
+              className="h-7 w-auto"
+            />
           </Link>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg hover:bg-background-hover transition-colors"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg hover:bg-background-hover transition-colors"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -124,13 +134,19 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       {/* Desktop sidebar */}
       <aside className="hidden lg:block fixed top-0 left-0 w-72 h-screen border-r border-border bg-background-secondary/50 overflow-y-auto">
         <div className="p-6">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-8">
-            <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center border border-accent/20">
-              <Terminal className="w-5 h-5 text-accent" />
-            </div>
-            <span>MIDL<span className="text-accent">.AI</span></span>
-          </Link>
+          {/* Logo & Theme Toggle */}
+          <div className="flex items-center justify-between mb-8">
+            <Link href="/" className="flex items-center">
+              <Image
+                src={resolvedTheme === 'dark' ? '/midl-ai-wordmark.svg' : '/midl-ai-wordmark-light.svg'}
+                alt="MIDL.AI"
+                width={120}
+                height={32}
+                className="h-8 w-auto"
+              />
+            </Link>
+            <ThemeToggle />
+          </div>
 
           {/* Docs home link */}
           <Link
