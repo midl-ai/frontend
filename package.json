@@ -14,7 +14,8 @@
   "pnpm": {
     "overrides": {
       "viem": "npm:@midl/viem"
-    }
+    },
+    "ignoredBuiltDependencies": ["sharp", "unrs-resolver"]
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.45",
