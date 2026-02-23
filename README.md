@@ -33,7 +33,7 @@ MIDL.AI is the first AI-powered terminal for interacting with MIDL Protocol — 
 </div>
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/midl-ai/assets/master/solution-architecture.svg" alt="Solution Architecture" width="100%"/>
+  <img src="https://raw.githubusercontent.com/midl-ai/assets/master/solution-overview.svg" alt="Solution Overview" width="100%"/>
 </div>
 
 ## What Makes MIDL.AI Special
@@ -78,16 +78,18 @@ MIDL Protocol is unique — it combines Bitcoin's security (L1) with EVM compati
   <img src="https://raw.githubusercontent.com/midl-ai/assets/master/mcp-architecture.svg" alt="MCP Architecture" width="100%"/>
 </div>
 
-### Frontend Architecture
+### Bitcoin L1 + EVM L2 Hybrid
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/midl-ai/assets/master/frontend-architecture.svg" alt="Frontend Architecture" width="100%"/>
+  <img src="https://raw.githubusercontent.com/midl-ai/assets/master/bitcoin-evm-layers.svg" alt="Bitcoin EVM Layers" width="100%"/>
 </div>
 
-### Technical Deep Dive
+MIDL Protocol uniquely combines Bitcoin's UTXO model (L1) with EVM's account model (L2). MIDL.AI seamlessly handles operations across both layers through a single conversational interface.
+
+### Tool Categories
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/midl-ai/assets/master/technical-deep-dive.svg" alt="Technical Deep Dive" width="100%"/>
+  <img src="https://raw.githubusercontent.com/midl-ai/assets/master/tool-categories.svg" alt="Tool Categories" width="100%"/>
 </div>
 
 ### Tech Stack
